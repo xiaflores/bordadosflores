@@ -1,65 +1,131 @@
-import Image from "next/image";
+'use client';
+
+import { useState } from 'react';
+import Header from './components/Header';
+import BottomNav from './components/BottomNav';
+import HeroSlider from './components/HeroSlider';
+import ProductCard from './components/ProductCard';
+import { mockProducts } from './data/products';
 
 export default function Home() {
+  const [selectedTag, setSelectedTag] = useState<'Todos' | 'Nuevos'>('Todos');
+
+  // Filter products by selected tag
+  const filteredProducts = mockProducts.filter((product) => {
+    if (selectedTag === 'Todos') return true;
+    return product.tags?.includes(selectedTag);
+  });
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
+    <>
+      {/* Top Header Navigation */}
+      <Header />
+
+      {/* Main Container */}
+      <main className="pt-20 pb-28 px-margin-mobile max-w-container-max mx-auto space-y-8 flex-1 w-full">
+        
+        {/* Automatic Hero Slider */}
+        <HeroSlider />
+
+        {/* Social Media Shortcuts Integration */}
+        <section className="flex justify-center gap-6 py-4" aria-label="Redes Sociales">
           <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
+            title="TikTok"
+            className="w-12 h-12 rounded-full bg-primary flex items-center justify-center text-on-primary shadow-md hover:bg-primary-container active:scale-90 transition-all"
+            href="https://tiktok.com"
             target="_blank"
             rel="noopener noreferrer"
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
+            <span className="material-symbols-outlined flex items-center justify-center">
+              video_library
+            </span>
           </a>
           <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
+            title="Instagram"
+            className="w-12 h-12 rounded-full bg-primary flex items-center justify-center text-on-primary shadow-md hover:bg-primary-container active:scale-90 transition-all"
+            href="https://instagram.com"
             target="_blank"
             rel="noopener noreferrer"
           >
-            Documentation
+            <span className="material-symbols-outlined flex items-center justify-center">
+              photo_camera
+            </span>
           </a>
-        </div>
+          <a
+            title="Facebook"
+            className="w-12 h-12 rounded-full bg-primary flex items-center justify-center text-on-primary shadow-md hover:bg-primary-container active:scale-90 transition-all"
+            href="https://facebook.com"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <span className="material-symbols-outlined flex items-center justify-center">
+              facebook
+            </span>
+          </a>
+          <a
+            title="WhatsApp"
+            className="w-12 h-12 rounded-full bg-primary flex items-center justify-center text-on-primary shadow-md hover:bg-primary-container active:scale-90 transition-all"
+            href="https://wa.me/591"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <span className="material-symbols-outlined flex items-center justify-center">
+              chat
+            </span>
+          </a>
+        </section>
+
+        {/* Flash Sale / Direct Sale Section */}
+        <section className="space-y-4">
+          <div className="flex flex-wrap items-baseline justify-between gap-y-2">
+            <div className="flex items-center gap-3">
+              <h3 className="font-headline-sm text-headline-sm font-bold text-on-surface">
+                Venta Directa
+              </h3>
+            </div>
+            
+            {/* Filter Tags */}
+            <div className="flex gap-2 overflow-x-auto hide-scrollbar w-full md:w-auto mt-2 md:mt-0">
+              <button
+                onClick={() => setSelectedTag('Todos')}
+                className={`px-4 py-2 rounded-full text-label-md font-label-md shrink-0 transition-all cursor-pointer ${
+                  selectedTag === 'Todos'
+                    ? 'bg-primary text-on-primary shadow-md'
+                    : 'bg-surface-container-high text-on-surface hover:bg-surface-container-highest'
+                }`}
+              >
+                Todos
+              </button>
+              <button
+                onClick={() => setSelectedTag('Nuevos')}
+                className={`px-4 py-2 rounded-full text-label-md font-label-md shrink-0 transition-all cursor-pointer ${
+                  selectedTag === 'Nuevos'
+                    ? 'bg-primary text-on-primary shadow-md'
+                    : 'bg-surface-container-high text-on-surface hover:bg-surface-container-highest'
+                }`}
+              >
+                Nuevos
+              </button>
+            </div>
+          </div>
+
+          {/* Dynamic Product Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-gutter">
+            {filteredProducts.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
+
+          {filteredProducts.length === 0 && (
+            <div className="text-center py-12 text-on-surface-variant">
+              No hay productos disponibles con esta etiqueta.
+            </div>
+          )}
+        </section>
       </main>
-    </div>
+
+      {/* Bottom Navigation Bar for Mobile */}
+      <BottomNav />
+    </>
   );
 }

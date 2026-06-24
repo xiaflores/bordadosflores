@@ -1,26 +1,132 @@
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700&family=Be+Vietnam+Pro:wght@400;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap');
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+
+@theme {
+  --color-on-primary: #ffffff;
+  --color-inverse-on-surface: #f3f0ef;
+  --color-surface-variant: #e5e2e1;
+  --color-outline: #8d6f75;
+  --color-on-tertiary-container: #ffd9e1;
+  --color-on-secondary-fixed-variant: #900038;
+  --color-on-primary-container: #ffd9df;
+  --color-on-primary-fixed-variant: #8f003f;
+  --color-on-error: #ffffff;
+  --color-surface-container: #f0edec;
+  --color-tertiary-container: #b33363;
+  --color-primary-fixed-dim: #ffb1c2;
+  --color-on-secondary-container: #fffbff;
+  --color-background: #fcf9f8;
+  --color-on-primary-fixed: #3f0018;
+  --color-secondary-container: #e2165f;
+  --color-secondary: #b80049;
+  --color-primary: #9b0044;
+  --color-inverse-primary: #ffb1c2;
+  --color-on-surface: #1c1b1b;
+  --color-surface-container-highest: #e5e2e1;
+  --color-on-tertiary-fixed-variant: #8b0e45;
+  --color-inverse-surface: #313030;
+  --color-on-tertiary: #ffffff;
+  --color-error-container: #ffdad6;
+  --color-surface-bright: #fcf9f8;
+  --color-surface-dim: #dcd9d9;
+  --color-tertiary: #93174b;
+  --color-on-background: #1c1b1b;
+  --color-surface-container-high: #ebe7e7;
+  --color-surface: #fcf9f8;
+  --color-on-secondary: #ffffff;
+  --color-surface-tint: #b90c55;
+  --color-secondary-fixed-dim: #ffb2be;
+  --color-on-tertiary-fixed: #3f001b;
+  --color-tertiary-fixed: #ffd9e1;
+  --color-primary-container: #c2185b;
+  --color-error: #ba1a1a;
+  --color-on-secondary-fixed: #400014;
+  --color-on-surface-variant: #594045;
+  --color-outline-variant: #e1bec4;
+  --color-tertiary-fixed-dim: #ffb1c5;
+  --color-primary-fixed: #ffd9df;
+  --color-secondary-fixed: #ffd9de;
+  --color-surface-container-low: #f6f3f2;
+  --color-surface-container-lowest: #ffffff;
+  --color-on-error-container: #93000a;
+
+  --radius-DEFAULT: 0.25rem;
+  --radius-lg: 0.5rem;
+  --radius-xl: 0.75rem;
+  --radius-full: 9999px;
+
+  --spacing-margin-tablet: 32px;
+  --spacing-container-max: 1280px;
+  --spacing-gutter: 16px;
+  --spacing-unit: 4px;
+  --spacing-margin-desktop: 64px;
+  --spacing-margin-mobile: 16px;
+
+  --font-headline-lg-mobile: 'Manrope', sans-serif;
+  --font-headline-xl: 'Manrope', sans-serif;
+  --font-headline-lg: 'Manrope', sans-serif;
+  --font-body-sm: 'Be Vietnam Pro', sans-serif;
+  --font-label-md: 'Be Vietnam Pro', sans-serif;
+  --font-headline-sm: 'Manrope', sans-serif;
+  --font-body-lg: 'Be Vietnam Pro', sans-serif;
+  --font-headline-md: 'Manrope', sans-serif;
+  --font-body-md: 'Be Vietnam Pro', sans-serif;
+
+  --text-headline-lg-mobile: 28px;
+  --text-headline-lg-mobile--line-height: 34px;
+  --text-headline-lg-mobile--font-weight: 700;
+
+  --text-headline-xl: 40px;
+  --text-headline-xl--line-height: 48px;
+  --text-headline-xl--letter-spacing: -0.02em;
+  --text-headline-xl--font-weight: 700;
+
+  --text-headline-lg: 32px;
+  --text-headline-lg--line-height: 40px;
+  --text-headline-lg--letter-spacing: -0.01em;
+  --text-headline-lg--font-weight: 700;
+
+  --text-body-sm: 14px;
+  --text-body-sm--line-height: 20px;
+  --text-body-sm--font-weight: 400;
+
+  --text-label-md: 12px;
+  --text-label-md--line-height: 16px;
+  --text-label-md--letter-spacing: 0.05em;
+  --text-label-md--font-weight: 600;
+
+  --text-headline-sm: 20px;
+  --text-headline-sm--line-height: 28px;
+  --text-headline-sm--font-weight: 600;
+
+  --text-body-lg: 18px;
+  --text-body-lg--line-height: 28px;
+  --text-body-lg--font-weight: 400;
+
+  --text-headline-md: 24px;
+  --text-headline-md--line-height: 32px;
+  --text-headline-md--font-weight: 600;
+
+  --text-body-md: 16px;
+  --text-body-md--line-height: 24px;
+  --text-body-md--font-weight: 400;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  min-height: max(884px, 100dvh);
 }
