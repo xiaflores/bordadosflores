@@ -1,14 +1,25 @@
 'use client';
 
-import { useState } from 'react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 
 export default function BottomNav() {
-  const [activeTab, setActiveTab] = useState<'inicio' | 'catalogo' | 'cesta' | 'perfil'>('inicio');
+  const pathname = usePathname();
+
+  const getActiveTab = () => {
+    if (pathname === '/') return 'inicio';
+    if (pathname.startsWith('/catalogo')) return 'catalogo';
+    if (pathname.startsWith('/cesta')) return 'cesta';
+    if (pathname.startsWith('/perfil')) return 'perfil';
+    return 'inicio';
+  };
+
+  const activeTab = getActiveTab();
 
   return (
     <nav className="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 py-3 pb-safe bg-secondary shadow-[0px_-4px_20px_rgba(0,0,0,0.08)] rounded-t-xl lg:hidden">
-      <button
-        onClick={() => setActiveTab('inicio')}
+      <Link
+        href="/"
         className={`flex flex-col items-center justify-center transition-all duration-300 ease-out active:scale-90 ${
           activeTab === 'inicio'
             ? 'scale-110 text-on-secondary font-bold'
@@ -22,10 +33,10 @@ export default function BottomNav() {
           home
         </span>
         <span className="font-label-md text-label-md mt-1">Inicio</span>
-      </button>
+      </Link>
 
-      <button
-        onClick={() => setActiveTab('catalogo')}
+      <Link
+        href="/catalogo"
         className={`flex flex-col items-center justify-center transition-all duration-300 ease-out active:scale-90 ${
           activeTab === 'catalogo'
             ? 'scale-110 text-on-secondary font-bold'
@@ -39,10 +50,10 @@ export default function BottomNav() {
           menu_book
         </span>
         <span className="font-label-md text-label-md mt-1">Catálogo</span>
-      </button>
+      </Link>
 
-      <button
-        onClick={() => setActiveTab('cesta')}
+      <Link
+        href="#"
         className={`flex flex-col items-center justify-center transition-all duration-300 ease-out active:scale-90 relative ${
           activeTab === 'cesta'
             ? 'scale-110 text-on-secondary font-bold'
@@ -59,10 +70,10 @@ export default function BottomNav() {
         <span className="absolute top-0 -right-1 bg-on-secondary text-secondary text-[10px] w-4 h-4 flex items-center justify-center rounded-full border border-secondary font-bold">
           2
         </span>
-      </button>
+      </Link>
 
-      <button
-        onClick={() => setActiveTab('perfil')}
+      <Link
+        href="#"
         className={`flex flex-col items-center justify-center transition-all duration-300 ease-out active:scale-90 ${
           activeTab === 'perfil'
             ? 'scale-110 text-on-secondary font-bold'
@@ -76,7 +87,7 @@ export default function BottomNav() {
           person
         </span>
         <span className="font-label-md text-label-md mt-1">Mi Perfil</span>
-      </button>
+      </Link>
     </nav>
   );
 }

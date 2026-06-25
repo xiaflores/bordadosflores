@@ -1,0 +1,353 @@
+<!DOCTYPE html><html class="light" lang="es"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport">
+<title>Catálogo - Bordados Flores</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&amp;family=Be+Vietnam+Pro:wght@400;600&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "tertiary-fixed": "#ffd9e1",
+                    "surface": "#fcf9f8",
+                    "surface-container-high": "#ebe7e7",
+                    "tertiary": "#93174b",
+                    "secondary-fixed-dim": "#ffb2be",
+                    "on-primary-fixed-variant": "#8f003f",
+                    "on-primary-fixed": "#3f0018",
+                    "inverse-surface": "#313030",
+                    "secondary-container": "#e2165f",
+                    "on-tertiary-fixed": "#3f001b",
+                    "secondary-fixed": "#ffd9de",
+                    "error-container": "#ffdad6",
+                    "surface-container-low": "#f6f3f2",
+                    "on-secondary-container": "#fffbff",
+                    "inverse-primary": "#ffb1c2",
+                    "surface-tint": "#b90c55",
+                    "surface-dim": "#dcd9d9",
+                    "on-background": "#1c1b1b",
+                    "primary-fixed": "#ffd9df",
+                    "on-surface": "#1c1b1b",
+                    "on-secondary-fixed-variant": "#900038",
+                    "secondary": "#b80049",
+                    "error": "#ba1a1a",
+                    "surface-bright": "#fcf9f8",
+                    "background": "#fcf9f8",
+                    "primary": "#9b0044",
+                    "surface-container-lowest": "#ffffff",
+                    "surface-container": "#f0edec",
+                    "on-secondary-fixed": "#400014",
+                    "on-tertiary-container": "#ffd9e1",
+                    "surface-variant": "#e5e2e1",
+                    "on-primary": "#ffffff",
+                    "on-tertiary": "#ffffff",
+                    "on-primary-container": "#ffd9df",
+                    "on-surface-variant": "#594045",
+                    "on-secondary": "#ffffff",
+                    "tertiary-container": "#b33363",
+                    "surface-container-highest": "#e5e2e1",
+                    "primary-container": "#c2185b",
+                    "on-error": "#ffffff",
+                    "tertiary-fixed-dim": "#ffb1c5",
+                    "outline": "#8d6f75",
+                    "on-error-container": "#93000a",
+                    "on-tertiary-fixed-variant": "#8b0e45",
+                    "primary-fixed-dim": "#ffb1c2",
+                    "outline-variant": "#e1bec4",
+                    "inverse-on-surface": "#f3f0ef"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "margin-tablet": "32px",
+                    "unit": "4px",
+                    "margin-mobile": "16px",
+                    "margin-desktop": "64px",
+                    "container-max": "1280px",
+                    "gutter": "16px"
+            },
+            "fontFamily": {
+                    "body-md": ["Be Vietnam Pro"],
+                    "headline-xl": ["Manrope"],
+                    "headline-md": ["Manrope"],
+                    "label-md": ["Be Vietnam Pro"],
+                    "headline-sm": ["Manrope"],
+                    "headline-lg-mobile": ["Manrope"],
+                    "body-lg": ["Be Vietnam Pro"],
+                    "headline-lg": ["Manrope"],
+                    "body-sm": ["Be Vietnam Pro"]
+            },
+            "fontSize": {
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "headline-xl": ["40px", {"lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "headline-sm": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "headline-lg-mobile": ["28px", {"lineHeight": "34px", "fontWeight": "700"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                    "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .backdrop-blur-nav { backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+        .custom-shadow { box-shadow: 0px 4px 20px rgba(0,0,0,0.04); }
+        .active-chip { background-color: #c2185b !important; color: white !important; }
+    </style>
+</head>
+<body class="bg-surface font-body-md text-on-surface min-h-screen pb-24 lg:pb-0">
+<!-- Header -->
+<header class="fixed top-0 left-0 w-full z-50 bg-white shadow-sm flex items-center px-margin-mobile h-16 md:px-margin-tablet lg:px-margin-desktop transition-all duration-200"><div class="max-w-container-max mx-auto w-full flex justify-between items-center h-full px-4 md:px-gutter">
+  <!-- Left: Logo and Brand Name -->
+  <div class="flex items-center gap-3">
+    <a class="flex items-center" href="#">
+      <img alt="Bordados Flores Logo" class="h-10 w-auto object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBDtduVbHBj1GKfzt4xt2a2kCME4EwTgfBiaqe-MHt5ZPesLRKXnqc51gl5XB6I-4zZE-bkRp6YDHVqnxrtPEeXnuJHKvsknkH2OtNKSfa6PcdfC-H887hNu3iFrjp270hSmhGKURiLhMoFMA3XVa888QkSp0k6c72kE1oLBWagD4wtXmpfSBvGwQMybzPtl_c94pzaYu3CVEELYChXpPb3VX0TnHsVJmj5PcWWXXN9Zz6qcQeJRq8PgyzhBwQmEgQCgsiiUCO3zQ">
+    </a>
+    <span class="font-headline-sm text-primary tracking-tight uppercase">Bordados Flores</span>
+  </div>
+
+  <!-- Right: Navigation (Desktop) and Icons -->
+  <div class="flex items-center gap-4 md:gap-8">
+    <!-- Desktop Navigation Links -->
+    <nav class="hidden lg:flex items-center gap-8">
+      <a class="font-body-md text-on-surface hover:text-primary transition-colors" href="#">Inicio</a>
+      <a class="font-body-md text-primary font-bold transition-colors" href="#">Catálogo</a>
+      <a class="font-body-md text-on-surface hover:text-primary transition-colors" href="#">Cesta</a>
+      <a class="font-body-md text-on-surface hover:text-primary transition-colors" href="#">Perfil</a>
+    </nav>
+
+    <!-- Action Icons -->
+    <div class="flex items-center gap-1">
+      <button class="material-symbols-outlined text-primary p-2 hover:bg-primary-container/10 rounded-full transition-colors">search</button>
+      <button class="material-symbols-outlined text-primary p-2 hover:bg-primary-container/10 rounded-full transition-colors">shopping_basket</button>
+    </div>
+  </div>
+</div></header>
+<main class="pt-20 px-margin-mobile md:px-margin-tablet lg:px-margin-desktop max-w-container-max mx-auto">
+<!-- Search Bar -->
+<section class="mt-4 w-full mb-4">
+<div class="relative group">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline group-focus-within:text-primary transition-colors">search</span>
+<input class="w-full h-12 pl-12 pr-4 bg-surface-container border-b-2 border-transparent focus:border-primary focus:ring-0 rounded-t-lg font-body-md transition-all outline-none" placeholder="Busca ponchos, polleras..." type="text">
+</div>
+</section>
+<!-- Category Quick Filters (Chips) -->
+<section class="mb-6 w-full">
+<div class="flex gap-3 overflow-x-auto no-scrollbar pb-2 w-full">
+<button class="flex-shrink-0 px-4 py-2 rounded-full bg-primary-container/10 text-primary font-label-md text-label-md transition-all duration-200 active:scale-95">Novedades</button>
+<button class="flex-shrink-0 px-4 py-2 rounded-full bg-primary-container/10 text-primary font-label-md text-label-md hover:bg-primary-container/20 transition-all duration-200 active:scale-95">Chaquetas</button>
+<button class="flex-shrink-0 px-4 py-2 rounded-full bg-primary-container/10 text-primary font-label-md text-label-md hover:bg-primary-container/20 transition-all duration-200 active:scale-95 active-chip">Polleras</button>
+<button class="flex-shrink-0 px-4 py-2 rounded-full bg-primary-container/10 text-primary font-label-md text-label-md hover:bg-primary-container/20 transition-all duration-200 active:scale-95">Accesorios</button>
+<button class="flex-shrink-0 px-4 py-2 rounded-full bg-primary-container/10 text-primary font-label-md text-label-md hover:bg-primary-container/20 transition-all duration-200 active:scale-95">Textiles</button>
+</div>
+</section>
+<!-- Product Count Header -->
+<div class="flex justify-between items-center mb-6">
+<span class="font-headline-sm text-headline-sm text-on-surface">10 Productos</span>
+</div>
+<!-- Product Grid -->
+<div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-gutter w-full">
+<!-- Product 1 -->
+<article class="bg-surface-container-lowest rounded-xl overflow-hidden custom-shadow group relative">
+<div class="relative aspect-[3/4] overflow-hidden">
+<img alt="Chaqueta - Blanco Nevado" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCtU1z2yLP174xm4NQGevSvs1p2vtrVJeBwrRrJx13zhhCvPsyxJoVo_LylGUhaJ6eQ80dL7GecJeIlylAb-OSDQMfGcvJR9QPPwX5yQInwOQ3V7ZMF7xHPaetCer5rMu43Ma3ViGI_lNfaZb4cz6WKhUsL0KuPiGKUCtiENoDn0GmNNR4Ej5eQIeyhjSHx3eVbU2pd44_HWpO3SfVicIVwdz2AphsfWEU3Nj_V3Fy-ejxkNjqLQ7owlZsreE2yOjv803wClEU85w">
+<button class="absolute top-2 left-2 w-10 h-10 flex items-center justify-center bg-white/80 backdrop-blur-sm rounded-full shadow-sm active:scale-90 transition-all" onclick="toggleFav(this)">
+<span class="material-symbols-outlined text-secondary" style="font-variation-settings: &quot;FILL&quot; 0;">favorite</span>
+</button>
+<span class="absolute top-3 right-3 bg-primary text-white text-[10px] font-bold px-2.5 py-1 rounded-sm uppercase tracking-wider z-10">A Pedido</span>
+</div>
+<div class="p-3">
+<p class="text-[10px] font-bold text-secondary uppercase tracking-widest mb-0.5">Chaquetas</p>
+<h3 class="font-headline-sm text-[16px] text-on-surface line-clamp-1 mb-1">Blanco Nevado</h3>
+<p class="font-bold text-primary mt-1">Bs. 950</p>
+</div>
+</article>
+<!-- Product 2 -->
+<article class="bg-surface-container-lowest rounded-xl overflow-hidden custom-shadow group relative">
+<div class="relative aspect-[3/4] overflow-hidden">
+<img alt="Pollera - Fucsia Tradicional" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCl_OgyWB3-x7vlS-AqxaNJY4WXPl4SnGDQluAOxCnM8J8Zk-LA3Thw-NtICtlusHIVZ0ihy2c_8byQz1woSAGc9_qv8tEfV5wgSbK835LwSMDWwNwFkLqdEf2HvvyqmI4KT5zPJhOk1V3g8dEPiQtMZCcnlSuPmMgTLP4PgxkcKIqO9AUd4F7bY9gu2iBvqg6uSlHTTugvqDqUnL6qeBjhxFZGz7M6JHqWXImci1CKelLOn0TOI8w0HzKtdaYwNV_s089SCJuQBw">
+<button class="absolute top-2 left-2 w-10 h-10 flex items-center justify-center bg-white/80 backdrop-blur-sm rounded-full shadow-sm active:scale-90 transition-all" onclick="toggleFav(this)">
+<span class="material-symbols-outlined text-secondary" style="font-variation-settings: &quot;FILL&quot; 0;">favorite</span>
+</button>
+<span class="absolute top-3 right-3 bg-primary text-white text-[10px] font-bold px-2.5 py-1 rounded-sm uppercase tracking-wider z-10">En Stock</span>
+</div>
+<div class="p-3">
+<p class="text-[10px] font-bold text-secondary uppercase tracking-widest mb-0.5">Polleras</p>
+<h3 class="font-headline-sm text-[16px] text-on-surface line-clamp-1 mb-1">Fucsia Tradicional</h3>
+<p class="font-bold text-primary mt-1">Bs. 850</p>
+</div>
+</article>
+<!-- Product 3 -->
+<article class="bg-surface-container-lowest rounded-xl overflow-hidden custom-shadow group relative">
+<div class="relative aspect-[3/4] overflow-hidden">
+<img alt="Chaqueta - Tierra de Fuego" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCbxEpEUd2n_sjjw25ZSabKc5dEgPb90jGZdKkioqk-0m2-7muCWsp8iHmCkoVIE3SDqD6OdV_QJdxuv0nPN64qTFf4TvRpd5SkSd8gCEgBjLWPFwZiKIJuYhJ7ZLMu5zJtvsH-LR5wPrY1UUyI0xK6tlwxC8kOrvYwwbUq8IOvG-PjDR8sfGpivttls72xqS8OIE3ymC6-w5-q7ElK0pEHYnVIsAcEc5UYsJeLlrpkk-7ht_voKfVXyJS1V-xdBoRNfBwIE4bisw">
+<button class="absolute top-2 left-2 w-10 h-10 flex items-center justify-center bg-white/80 backdrop-blur-sm rounded-full shadow-sm active:scale-90 transition-all" onclick="toggleFav(this)">
+<span class="material-symbols-outlined text-secondary" style="font-variation-settings: &quot;FILL&quot; 0;">favorite</span>
+</button>
+<span class="absolute top-3 right-3 bg-primary text-white text-[10px] font-bold px-2.5 py-1 rounded-sm uppercase tracking-wider z-10">En Stock</span>
+</div>
+<div class="p-3">
+<p class="text-[10px] font-bold text-secondary uppercase tracking-widest mb-0.5">Chaquetas</p>
+<h3 class="font-headline-sm text-[16px] text-on-surface line-clamp-1 mb-1">Tierra de Fuego</h3>
+<p class="font-bold text-primary mt-1">Bs. 1,100</p>
+</div>
+</article>
+<!-- Product 4 -->
+<article class="bg-surface-container-lowest rounded-xl overflow-hidden custom-shadow group relative">
+<div class="relative aspect-[3/4] overflow-hidden">
+<img alt="Chaqueta - Minimal Negro" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAcmrbNkagVbOU6jvPXSJOnDmuyZmPU6wZU6LIB8KYGkm9PQ_yJIWdK59XrvU29m5xvzcMaYh29TtOPZz9uEbYNG5GspucOMGnCNh37TuceWeGgC4lYqSgfVfNugvxtLJ77Ty1mEURazYjWiN3oQQMl36cgvvDDOg2s20VueyHkLcl0MaaWLPqBnxMIOKgUi-EdyByO8-iMzuXFrIYBod2b6F139k6O3dIz7sLCI5xRD4XKqISbszch4TZFIjh5cVf987jrZEsTGQ">
+<button class="absolute top-2 left-2 w-10 h-10 flex items-center justify-center bg-white/80 backdrop-blur-sm rounded-full shadow-sm active:scale-90 transition-all" onclick="toggleFav(this)">
+<span class="material-symbols-outlined text-secondary" style="font-variation-settings: &quot;FILL&quot; 0;">favorite</span>
+</button>
+<span class="absolute top-3 right-3 bg-primary text-white text-[10px] font-bold px-2.5 py-1 rounded-sm uppercase tracking-wider z-10">A Pedido</span>
+</div>
+<div class="p-3">
+<p class="text-[10px] font-bold text-secondary uppercase tracking-widest mb-0.5">Chaquetas</p>
+<h3 class="font-headline-sm text-[16px] text-on-surface line-clamp-1 mb-1">Minimal Negro</h3>
+<p class="font-bold text-primary mt-1">Bs. 880</p>
+</div>
+</article>
+<!-- Product 5 -->
+<article class="bg-surface-container-lowest rounded-xl overflow-hidden custom-shadow group relative">
+<div class="relative aspect-[3/4] overflow-hidden">
+<img alt="Pollera - Gala Esmeralda" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAtkwRHIAOIHr1ORleAJ8gQ_VyViOz2IDZ8G16izKpUVoCUSYVWo_W0cjL1vRjyJ5rwOloyP9goI2X8qZDgpUSVqBoyuTZ0uNCRYwkeQgCDPY5spLFap5LNKl931Fn717Cp6KzvIzoeLzd5TooaTUySuxEeM0m_Xa1I1LeB-C-5SVYcE8S7rIsF25fqo_EOeJKLQ7P-bzJHVPgr-phv8q0T4IOJQUIv3GjVBekaeVNt0NuaYFboE8zAJRrxE4DQxXzg420LAYgG-A">
+<button class="absolute top-2 left-2 w-10 h-10 flex items-center justify-center bg-white/80 backdrop-blur-sm rounded-full shadow-sm active:scale-90 transition-all" onclick="toggleFav(this)">
+<span class="material-symbols-outlined text-secondary" style="font-variation-settings: &quot;FILL&quot; 0;">favorite</span>
+</button>
+<span class="absolute top-3 right-3 bg-primary text-white text-[10px] font-bold px-2.5 py-1 rounded-sm uppercase tracking-wider z-10">A Pedido</span>
+</div>
+<div class="p-3">
+<p class="text-[10px] font-bold text-secondary uppercase tracking-widest mb-0.5">Polleras</p>
+<h3 class="font-headline-sm text-[16px] text-on-surface line-clamp-1 mb-1">Gala Esmeralda</h3>
+<p class="font-bold text-primary mt-1">Bs. 1,450</p>
+</div>
+</article>
+<!-- Product 6 -->
+<article class="bg-surface-container-lowest rounded-xl overflow-hidden custom-shadow group relative">
+<div class="relative aspect-[3/4] overflow-hidden">
+<img alt="Pollera - Rayas Tradicionales" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" src="https://lh3.googleusercontent.com/aida-public/AB6AXuADcMa7qBWtlu6MIQlhEdweXGxdE6M0t0w0YZmeX4HmGlP7HpL13cgOMAe2EizAXjreEa7Rryc8XLRVx1TQiNLbcyFTW85EbNnE6_w1gdE4BXv6ouXccPIT_T04DJbVuFTlQ0al97GjNKiuoYbTSAT3fifPWynGA325JUuPKKTBkWVIGHdqN2VYLxQFIm_OE0OPuvHsAiD29qUPJbt3oHhbYlIxUWsFTVLpU9jr3cF33nyZdYZZMXnptKf3hcQvB1PO9-myVfr9gw">
+<button class="absolute top-2 left-2 w-10 h-10 flex items-center justify-center bg-white/80 backdrop-blur-sm rounded-full shadow-sm active:scale-90 transition-all" onclick="toggleFav(this)">
+<span class="material-symbols-outlined text-secondary" style="font-variation-settings: &quot;FILL&quot; 0;">favorite</span>
+</button>
+<span class="absolute top-3 right-3 bg-primary text-white text-[10px] font-bold px-2.5 py-1 rounded-sm uppercase tracking-wider z-10">En Stock</span>
+</div>
+<div class="p-3">
+<p class="text-[10px] font-bold text-secondary uppercase tracking-widest mb-0.5">Polleras</p>
+<h3 class="font-headline-sm text-[16px] text-on-surface line-clamp-1 mb-1">Rayas Tradicionales</h3>
+<p class="font-bold text-primary mt-1">Bs. 720</p>
+</div>
+</article>
+<!-- Product 7 -->
+<article class="bg-surface-container-lowest rounded-xl overflow-hidden custom-shadow group relative">
+<div class="relative aspect-[3/4] overflow-hidden">
+<img alt="Pollera - Detalle Carmín" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD7ybbODaWoA6v3pPG9XNzrTcUNyVe5PmAmtWffpNp8FW-krN5Ai0241ujBUll2b6Im_S6e3NW6dUb_5zOr8tddLuu_EiUVzDsPXtJoqGuFpqGhYvxfJQSe4NQgrZO8yQd0kqwf2N59k1IVMb3Hdhq-yYxbC1BmPW3REosV0Q5m97bPfSMpo7AaJg2y7Yej4ghpfDYMaOnJTg-nL0JyaKxylHg87mksadFLvhcGdwKEfvxkd7syzcUdzFoqex-1hsAJ2tiejkXgDw">
+<button class="absolute top-2 left-2 w-10 h-10 flex items-center justify-center bg-white/80 backdrop-blur-sm rounded-full shadow-sm active:scale-90 transition-all" onclick="toggleFav(this)">
+<span class="material-symbols-outlined text-secondary" style="font-variation-settings: &quot;FILL&quot; 0;">favorite</span>
+</button>
+<span class="absolute top-3 right-3 bg-primary text-white text-[10px] font-bold px-2.5 py-1 rounded-sm uppercase tracking-wider z-10">A Pedido</span>
+</div>
+<div class="p-3">
+<p class="text-[10px] font-bold text-secondary uppercase tracking-widest mb-0.5">Polleras</p>
+<h3 class="font-headline-sm text-[16px] text-on-surface line-clamp-1 mb-1">Detalle Carmín</h3>
+<p class="font-bold text-primary mt-1">Bs. 890</p>
+</div>
+</article>
+<!-- Product 8 -->
+<article class="bg-surface-container-lowest rounded-xl overflow-hidden custom-shadow group relative">
+<div class="relative aspect-[3/4] overflow-hidden">
+<img alt="Chaqueta - Crema Llama" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC2YJ1D9aTzsmgdBmlvnW8wuLluIMw_9WXB8r4J93ASz6FGDDzX40rJzIuNJVAX1bkbS70aPziCkl02p1lt_Yi_mmyeZYDfyjHQ9ViLznW1M-c5x6F4vXZMyJxFrIBb0TD-ZF44FgVqXBPWelywfGjzp6tCnMU0MvQGX37On0suTl-cAyXdQWDGnSBeoLF4zqFT7YWCgSQOp4YIYZKIaJhhM4EHpflmTqjX78-HwcWAfnXLOXGcEsWYpNGhYaX2oz6EMPNR9ikajQ">
+<button class="absolute top-2 left-2 w-10 h-10 flex items-center justify-center bg-white/80 backdrop-blur-sm rounded-full shadow-sm active:scale-90 transition-all" onclick="toggleFav(this)">
+<span class="material-symbols-outlined text-secondary" style="font-variation-settings: &quot;FILL&quot; 0;">favorite</span>
+</button>
+<span class="absolute top-3 right-3 bg-primary text-white text-[10px] font-bold px-2.5 py-1 rounded-sm uppercase tracking-wider z-10">En Stock</span>
+</div>
+<div class="p-3">
+<p class="text-[10px] font-bold text-secondary uppercase tracking-widest mb-0.5">Chaquetas</p>
+<h3 class="font-headline-sm text-[16px] text-on-surface line-clamp-1 mb-1">Crema Llama</h3>
+<p class="font-bold text-primary mt-1">Bs. 1,050</p>
+</div>
+</article>
+<!-- Product 9 -->
+<article class="bg-surface-container-lowest rounded-xl overflow-hidden custom-shadow group relative">
+<div class="relative aspect-[3/4] overflow-hidden">
+<img alt="Pollera - Bosque Profundo" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCUgdGeSXnZ1vdnIbS48L5jnuVpW37ZZKdfi-E2zbSESiVocfSVu-ULPLe1jWI0ucJViw2yWEgN27KujpLGP9ipLdO7VtRh4LnxnGmezIKnVkvR0x8KeQvIHECoiLgKnkjo5bNqMAbcw53dc3AcSS18qlxsITl4nwE_oZq2cGOIaCbLPkak9BpbzhXV1PgvORTzkSxgaZIakL0_TqA4gNgGIsb9lrnir4_COnhvGJkuaeVpaHPnemFQA39g_4JjjLc0GefL4bmePw">
+<button class="absolute top-2 left-2 w-10 h-10 flex items-center justify-center bg-white/80 backdrop-blur-sm rounded-full shadow-sm active:scale-90 transition-all" onclick="toggleFav(this)">
+<span class="material-symbols-outlined text-secondary" style="font-variation-settings: &quot;FILL&quot; 0;">favorite</span>
+</button>
+<span class="absolute top-3 right-3 bg-primary text-white text-[10px] font-bold px-2.5 py-1 rounded-sm uppercase tracking-wider z-10">A Pedido</span>
+</div>
+<div class="p-3">
+<p class="text-[10px] font-bold text-secondary uppercase tracking-widest mb-0.5">Polleras</p>
+<h3 class="font-headline-sm text-[16px] text-on-surface line-clamp-1 mb-1">Bosque Profundo</h3>
+<p class="font-bold text-primary mt-1">Bs. 1,200</p>
+</div>
+</article>
+<!-- Product 10 -->
+<article class="bg-surface-container-lowest rounded-xl overflow-hidden custom-shadow group relative">
+<div class="relative aspect-[3/4] overflow-hidden">
+<img alt="Chaqueta - Aguayo Magenta" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBLT-4fV81GLAvOj-rjZvka6RNmiUlyGWh_IEuU2GlLn9OMQqVLMOV3-3sILaIsuNaAQ_PXQN4UC1JBnNp9OiRHqJozVVWUFgYTap_LXt3Kh5DUhdxp2Lu4mYRPY_JgugzJB2LU-Z2FUMFd3wzlbDqVIHDjiJSqPpidtcESEO_hNFLaNxyN9DFJw1Pmov_Luh4L31SvGZeHe0slbWr_NY0aX_4hpD4SSljaB0xdufVByuSpe9J2H_z45QIp2tgDPY2epQHEjsbuYw">
+<button class="absolute top-2 left-2 w-10 h-10 flex items-center justify-center bg-white/80 backdrop-blur-sm rounded-full shadow-sm active:scale-90 transition-all" onclick="toggleFav(this)">
+<span class="material-symbols-outlined text-secondary" style="font-variation-settings: &quot;FILL&quot; 0;">favorite</span>
+</button>
+<span class="absolute top-3 right-3 bg-primary text-white text-[10px] font-bold px-2.5 py-1 rounded-sm uppercase tracking-wider z-10">En Stock</span>
+</div>
+<div class="p-3">
+<p class="text-[10px] font-bold text-secondary uppercase tracking-widest mb-0.5">Chaquetas</p>
+<h3 class="font-headline-sm text-[16px] text-on-surface line-clamp-1 mb-1">Aguayo Magenta</h3>
+<p class="font-bold text-primary mt-1">Bs. 980</p>
+</div>
+</article>
+</div>
+</main>
+<!-- Bottom Navigation Bar (Hidden on Desktop) -->
+<nav class="lg:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 py-3 pb-safe bg-secondary shadow-[0px_-4px_20px_rgba(0,0,0,0.08)] rounded-t-xl transition-all">
+<a class="flex flex-col items-center justify-center text-on-secondary/70 transition-transform duration-300 ease-out active:scale-90 hover:bg-on-secondary/10 rounded-lg p-1" href="#">
+<span class="material-symbols-outlined">home</span>
+<span class="font-label-md text-label-md">Inicio</span>
+</a>
+<a class="flex flex-col items-center justify-center scale-110 text-on-secondary font-bold transition-transform duration-300 ease-out active:scale-90 hover:bg-on-secondary/10 rounded-lg p-1" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: &quot;FILL&quot; 1;">menu_book</span>
+<span class="font-label-md text-label-md">Catálogo</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-secondary/70 transition-transform duration-300 ease-out active:scale-90 hover:bg-on-secondary/10 rounded-lg p-1" href="#">
+<span class="material-symbols-outlined">shopping_cart</span>
+<span class="font-label-md text-label-md">Cesta</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-secondary/70 transition-transform duration-300 ease-out active:scale-90 hover:bg-on-secondary/10 rounded-lg p-1" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="font-label-md text-label-md">Perfil</span>
+</a>
+</nav>
+<script>
+        function toggleFav(btn) {
+            const icon = btn.querySelector('.material-symbols-outlined');
+            const isFilled = icon.style.fontVariationSettings.includes("'FILL' 1");
+            if (isFilled) {
+                icon.style.fontVariationSettings = "'FILL' 0";
+            } else {
+                icon.style.fontVariationSettings = "'FILL' 1";
+            }
+        }
+
+        document.querySelectorAll('section div button').forEach(chip => {
+            chip.addEventListener('click', () => {
+                document.querySelectorAll('section div button').forEach(c => c.classList.remove('active-chip'));
+                chip.classList.add('active-chip');
+            });
+        });
+    </script>
+
+
+</body></html>

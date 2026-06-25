@@ -11,7 +11,7 @@ export default function ProductCard({ product }: ProductCardProps) {
   const [isFavorite, setIsFavorite] = useState(false);
 
   return (
-    <div className="bg-surface-container-lowest rounded-2xl overflow-hidden shadow-[0px_4px_20px_rgba(0,0,0,0.04)] hover:shadow-lg transition-all duration-300 group flex flex-col justify-between">
+    <article className="bg-surface-container-lowest rounded-xl overflow-hidden shadow-[0px_4px_20px_rgba(0,0,0,0.04)] hover:shadow-lg transition-all duration-300 group relative flex flex-col justify-between">
       <div>
         {/* Product Image Container */}
         <div className="relative aspect-[3/4] overflow-hidden bg-surface-container-low">
@@ -21,68 +21,59 @@ export default function ProductCard({ product }: ProductCardProps) {
             alt={product.name}
           />
 
-          {/* Favorite Button */}
+          {/* Favorite Button (Top-Left) */}
           <button
             onClick={() => setIsFavorite(!isFavorite)}
-            className={`absolute top-2 right-2 w-8 h-8 bg-white/85 backdrop-blur-xs rounded-full flex items-center justify-center transition-all active:scale-90 hover:bg-white shadow-sm ${
-              isFavorite ? 'text-primary' : 'text-on-surface-variant'
+            className={`absolute top-2 left-2 w-10 h-10 bg-white/80 backdrop-blur-xs rounded-full flex items-center justify-center transition-all active:scale-90 shadow-sm ${
+              isFavorite ? 'text-primary' : 'text-secondary'
             }`}
             aria-label="Agregar a favoritos"
           >
             <span
-              className="material-symbols-outlined text-[18px]"
-              style={{ fontVariationSettings: isFavorite ? '"FILL" 1' : undefined }}
+              className="material-symbols-outlined text-[20px]"
+              style={{ fontVariationSettings: isFavorite ? '"FILL" 1' : '"FILL" 0' }}
             >
               favorite
             </span>
           </button>
 
-          {/* Discount Badge */}
+          {/* Availability Badge (Top-Right) */}
+          <span className="absolute top-3 right-3 bg-primary text-white text-[10px] font-bold px-2.5 py-1 rounded-xs uppercase tracking-wider z-10 shadow-sm">
+            {product.availability}
+          </span>
+
+          {/* Discount Badge (Bottom-Left) */}
           {product.discount && (
             <div className="absolute bottom-2 left-2 bg-error text-white px-2 py-1 rounded text-label-md font-label-md font-bold shadow-xs">
               -{product.discount}%
             </div>
           )}
-
-          {/* Stock Availability Badge */}
-          <div
-            className={`absolute bottom-2 right-2 px-2 py-1 rounded text-label-md font-label-md font-semibold shadow-xs ${
-              product.availability === 'En Stock'
-                ? 'bg-secondary-container text-on-secondary-container'
-                : 'bg-surface-container-high text-on-surface'
-            }`}
-          >
-            {product.availability}
-          </div>
         </div>
 
         {/* Product Content Details */}
-        <div className="p-3 flex flex-col gap-1">
-          <span className="text-[10px] font-label-md text-primary uppercase tracking-wider mb-1 block">
+        <div className="p-3">
+          <p className="text-[10px] font-bold text-secondary uppercase tracking-widest mb-0.5">
             {product.category}
-          </span>
-          <h4
-            className="font-label-md text-label-md text-on-surface-variant truncate"
-            title={product.name}
-          >
+          </p>
+          <h3 className="font-headline-sm text-[16px] text-on-surface line-clamp-1 mb-1">
             {product.name}
-          </h4>
+          </h3>
         </div>
       </div>
 
       <div className="px-3 pb-3">
         {/* Pricing Layout */}
         <div className="flex items-center gap-2 mt-1">
-          <span className="font-headline-sm text-headline-sm text-primary font-bold">
-            {product.price.toFixed(2)} Bs.
+          <span className="font-bold text-primary">
+            Bs. {product.price.toLocaleString('es-BO')}
           </span>
           {product.originalPrice && (
-            <span className="font-body-sm text-body-sm line-through text-on-surface-variant/50">
-              {product.originalPrice.toFixed(2)} Bs.
+            <span className="text-[12px] line-through text-on-surface-variant/50">
+              Bs. {product.originalPrice.toLocaleString('es-BO')}
             </span>
           )}
         </div>
       </div>
-    </div>
+    </article>
   );
 }
