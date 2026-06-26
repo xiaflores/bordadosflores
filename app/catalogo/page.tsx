@@ -6,16 +6,18 @@ import BottomNav from '../components/BottomNav';
 import ProductCard from '../components/ProductCard';
 import { mockProducts } from '../data/products';
 
-type FilterType = 'Novedades' | 'Chaquetas' | 'Polleras' | 'Accesorios' | 'Textiles';
+type FilterType = 'Todos' | 'Novedades' | 'Chaquetas' | 'Polleras' | 'Accesorios';
 
 export default function CatalogoPage() {
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedFilter, setSelectedFilter] = useState<FilterType>('Polleras');
+  const [selectedFilter, setSelectedFilter] = useState<FilterType>('Todos');
 
   // Filter products by active chip and search query
   const filteredProducts = mockProducts.filter((product) => {
     // 1. Filter by chip selection
-    if (selectedFilter === 'Novedades') {
+    if (selectedFilter === 'Todos') {
+      // Allow all
+    } else if (selectedFilter === 'Novedades') {
       if (!product.tags?.includes('Novedades')) return false;
     } else {
       if (product.category !== selectedFilter) return false;
@@ -32,7 +34,7 @@ export default function CatalogoPage() {
     return true;
   });
 
-  const filterChips: FilterType[] = ['Novedades', 'Chaquetas', 'Polleras', 'Accesorios', 'Textiles'];
+  const filterChips: FilterType[] = ['Todos', 'Novedades', 'Chaquetas', 'Polleras', 'Accesorios'];
 
   return (
     <>
@@ -112,7 +114,7 @@ export default function CatalogoPage() {
             <button
               onClick={() => {
                 setSearchQuery('');
-                setSelectedFilter('Polleras');
+                setSelectedFilter('Todos');
               }}
               className="mt-4 text-primary font-bold underline hover:opacity-80 cursor-pointer"
             >
