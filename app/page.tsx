@@ -6,15 +6,15 @@ import { Product } from './data/products';
 import { supabase } from './lib/supabase';
 
 export default async function Home() {
-  // Fetch only products with 'Nuevos' or 'Novedades' tags
+  // Fetch only featured products (featured = true)
   const { data: rawProducts, error } = await supabase
     .from('productos')
     .select('*')
-    .overlaps('tags', ['Nuevos', 'Novedades'])
+    .eq('featured', true)
     .order('id', { ascending: true });
 
   if (error) {
-    console.error('Error fetching new products from Supabase:', error);
+    console.error('Error fetching featured products from Supabase:', error);
   }
 
   const products = (rawProducts || []).map((p) => ({
@@ -82,11 +82,11 @@ export default async function Home() {
           </a>
         </section>
 
-        {/* New Products Showcase */}
+        {/* Featured Products Showcase */}
         <section className="space-y-4">
           <div className="flex flex-wrap items-baseline justify-between gap-y-2">
             <h3 className="font-headline-sm text-headline-sm font-bold text-on-surface">
-              Novedades más recientes
+              Productos Destacados
             </h3>
           </div>
 
@@ -99,7 +99,7 @@ export default async function Home() {
 
           {products.length === 0 && (
             <div className="text-center py-12 text-on-surface-variant">
-              No hay novedades disponibles en este momento.
+              No hay productos destacados en este momento.
             </div>
           )}
         </section>
