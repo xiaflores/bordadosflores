@@ -3,12 +3,25 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { supabase } from '../lib/supabase';
+import { User } from '@supabase/supabase-js';
 
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const pathname = usePathname();
+  const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
+    // Get initial session
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      setUser(user);
+    });
+
+    // Listen to changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+
     const handleScroll = () => {
       if (window.scrollY > 20) {
         setIsScrolled(true);
@@ -17,7 +30,11 @@ export default function Header() {
       }
     };
     window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      subscription.unsubscribe();
+    };
   }, []);
 
   return (
@@ -60,14 +77,37 @@ export default function Header() {
             >
               Catálogo
             </Link>
-            <Link
-              className={`font-bold text-label-md uppercase tracking-wider transition-colors ${
-                pathname.startsWith('/cesta') ? 'text-primary' : 'text-on-surface hover:text-primary'
-              }`}
-              href="#"
-            >
-              Mi Perfil
-            </Link>
+            {user ? (
+              <Link
+                href="/login"
+                className="flex items-center gap-2 hover:opacity-80 transition-all"
+              >
+                {user.user_metadata?.avatar_url || user.user_metadata?.picture ? (
+                  <img
+                    src={user.user_metadata.avatar_url || user.user_metadata.picture}
+                    alt={user.user_metadata.full_name || 'Perfil'}
+                    className="w-8 h-8 rounded-full border border-primary/20 object-cover shadow-sm"
+                    referrerPolicy="no-referrer"
+                  />
+                ) : (
+                  <div className="w-8 h-8 rounded-full bg-primary text-on-primary flex items-center justify-center font-bold text-sm shadow-sm uppercase">
+                    {(user.user_metadata?.full_name || user.email || 'U').charAt(0)}
+                  </div>
+                )}
+                <span className="hidden sm:inline font-bold text-label-md uppercase tracking-wider text-on-surface">
+                  {user.user_metadata?.full_name?.split(' ')[0] || user.email?.split('@')[0] || 'Mi Perfil'}
+                </span>
+              </Link>
+            ) : (
+              <Link
+                className={`font-bold text-label-md uppercase tracking-wider transition-colors ${
+                  pathname === '/login' ? 'text-primary' : 'text-on-surface hover:text-primary'
+                }`}
+                href="/login"
+              >
+                Mi Perfil
+              </Link>
+            )}
           </nav>
 
           <div className="flex items-center gap-1 md:gap-2">

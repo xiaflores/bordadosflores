@@ -135,3 +135,19 @@
 body {
   min-height: max(884px, 100dvh);
 }
+
+.artisanal-bg {
+  background-color: #fcf9f8;
+  background-image: url("https://www.transparenttextures.com/patterns/natural-paper.png");
+  background-repeat: repeat;
+}
+
+.soft-elevation {
+  box-shadow: 0px 4px 20px rgba(0,0,0,0.04);
+}
+
+input:focus {
+  outline: none;
+  border-bottom-color: #9b0044 !important;
+}
+

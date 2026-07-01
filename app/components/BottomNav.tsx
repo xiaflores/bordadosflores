@@ -1,16 +1,36 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { supabase } from '../lib/supabase';
+import { User } from '@supabase/supabase-js';
 
 export default function BottomNav() {
   const pathname = usePathname();
+  const [user, setUser] = useState<User | null>(null);
+
+  useEffect(() => {
+    // Get initial session
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      setUser(user);
+    });
+
+    // Listen to changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []);
 
   const getActiveTab = () => {
     if (pathname === '/') return 'inicio';
     if (pathname.startsWith('/catalogo')) return 'catalogo';
     if (pathname.startsWith('/cesta')) return 'cesta';
-    if (pathname.startsWith('/perfil')) return 'perfil';
+    if (pathname.startsWith('/login')) return 'perfil';
     return 'inicio';
   };
 
@@ -73,19 +93,28 @@ export default function BottomNav() {
       </Link>
 
       <Link
-        href="#"
+        href="/login"
         className={`flex flex-col items-center justify-center transition-all duration-300 ease-out active:scale-90 ${
           activeTab === 'perfil'
             ? 'scale-110 text-on-secondary font-bold'
             : 'text-on-secondary/70 hover:bg-on-secondary/10 rounded-lg p-1'
         }`}
       >
-        <span
-          className="material-symbols-outlined"
-          style={{ fontVariationSettings: activeTab === 'perfil' ? '"FILL" 1' : undefined }}
-        >
-          person
-        </span>
+        {user && (user.user_metadata?.avatar_url || user.user_metadata?.picture) ? (
+          <img
+            src={user.user_metadata.avatar_url || user.user_metadata.picture}
+            alt="Perfil"
+            className="w-6 h-6 rounded-full border border-on-secondary/20 object-cover"
+            referrerPolicy="no-referrer"
+          />
+        ) : (
+          <span
+            className="material-symbols-outlined"
+            style={{ fontVariationSettings: activeTab === 'perfil' ? '"FILL" 1' : undefined }}
+          >
+            person
+          </span>
+        )}
         <span className="font-label-md text-label-md mt-1">Mi Perfil</span>
       </Link>
     </nav>
