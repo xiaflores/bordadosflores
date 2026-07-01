@@ -10,6 +10,12 @@ export interface Product {
   description: string;
   tags?: string[];
   images?: string[];
+  color_name?: string;
+  color_hex?: string;
+  largo?: number;
+  cintura?: number;
+  panos?: number;
+  talla?: string;
 }
 
 export const mockProducts: Product[] = [

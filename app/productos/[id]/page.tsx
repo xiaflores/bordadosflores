@@ -1,0 +1,47 @@
+import { notFound } from 'next/navigation';
+import { Metadata } from 'next';
+import { supabase } from '../../lib/supabase';
+import ProductDetailClient from './ProductDetailClient';
+
+interface ProductDetailPageProps {
+  params: Promise<{ id: string }>;
+}
+
+export async function generateMetadata({ params }: ProductDetailPageProps): Promise<Metadata> {
+  const { id } = await params;
+  
+  const { data: product } = await supabase
+    .from('productos')
+    .select('name,description')
+    .eq('id', id)
+    .single();
+
+  if (!product) {
+    return {
+      title: 'Producto no encontrado | Bordados Flores'
+    };
+  }
+
+  return {
+    title: `${product.name} - Bordados Flores`,
+    description: product.description
+  };
+}
+
+export default async function ProductDetailPage({ params }: ProductDetailPageProps) {
+  const { id } = await params;
+
+  // Fetch the product from Supabase database
+  const { data: product, error } = await supabase
+    .from('productos')
+    .select('*')
+    .eq('id', id)
+    .single();
+
+  if (error || !product) {
+    console.error('Error fetching product detail:', error);
+    return notFound();
+  }
+
+  return <ProductDetailClient product={product} />;
+}
