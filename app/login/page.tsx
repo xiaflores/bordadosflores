@@ -25,12 +25,38 @@ export default function LoginPage() {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
+  // Helper to ensure a profile record exists in public.profiles table
+  const ensureProfileExists = async (currentUser: User) => {
+    try {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('id', currentUser.id)
+        .maybeSingle();
+
+      if (!profile) {
+        await supabase.from('profiles').insert([{
+          id: currentUser.id,
+          email: currentUser.email,
+          full_name: currentUser.user_metadata?.full_name || currentUser.user_metadata?.name || '',
+          avatar_url: currentUser.user_metadata?.avatar_url || currentUser.user_metadata?.picture || '',
+          role: 'user'
+        }]);
+      }
+    } catch (err) {
+      console.error('Error ensuring profile exists:', err);
+    }
+  };
+
   // Check current session on mount
   useEffect(() => {
     const checkUser = async () => {
       try {
         const { data: { user } } = await supabase.auth.getUser();
-        setUser(user);
+        if (user) {
+          await ensureProfileExists(user);
+          setUser(user);
+        }
       } catch (err) {
         console.error('Error fetching user:', err);
       } finally {
@@ -40,8 +66,13 @@ export default function LoginPage() {
     
     checkUser();
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      if (session?.user) {
+        await ensureProfileExists(session.user);
+        setUser(session.user);
+      } else {
+        setUser(null);
+      }
       setCheckingAuth(false);
     });
 

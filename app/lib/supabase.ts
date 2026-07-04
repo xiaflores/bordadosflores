@@ -8,3 +8,12 @@ if (!supabaseUrl || !supabaseAnonKey) {
 }
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+
+if (typeof window !== 'undefined') {
+  supabase.auth.onAuthStateChange((_event, session) => {
+    const token = session?.access_token || '';
+    const maxAge = session ? 7 * 24 * 60 * 60 : 0; // 7 days or delete
+    document.cookie = `sb-access-token=${token}; path=/; max-age=${maxAge}; SameSite=Lax; Secure`;
+  });
+}
+

@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Bordados Flores - Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&amp;family=Be+Vietnam+Pro:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "secondary-fixed": "#ffd9de",
+                        "secondary-container": "#e2165f",
+                        "primary-fixed-dim": "#ffb1c2",
+                        "surface-container-lowest": "#ffffff",
+                        "tertiary-fixed": "#ffd9e1",
+                        "surface": "#fcf9f8",
+                        "secondary-fixed-dim": "#ffb2be",
+                        "surface-dim": "#dcd9d9",
+                        "on-secondary-container": "#fffbff",
+                        "background": "#fcf9f8",
+                        "tertiary-container": "#b33363",
+                        "outline": "#8d6f75",
+                        "surface-container-highest": "#e5e2e1",
+                        "inverse-on-surface": "#f3f0ef",
+                        "surface-variant": "#e5e2e1",
+                        "surface-container-low": "#f6f3f2",
+                        "on-tertiary-fixed-variant": "#8b0e45",
+                        "tertiary-fixed-dim": "#ffb1c5",
+                        "on-error": "#ffffff",
+                        "secondary": "#b80049",
+                        "on-secondary": "#ffffff",
+                        "on-tertiary": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "primary-container": "#c2185b",
+                        "primary-fixed": "#ffd9df",
+                        "on-primary-fixed": "#3f0018",
+                        "tertiary": "#93174b",
+                        "surface-tint": "#b90c55",
+                        "inverse-surface": "#313030",
+                        "inverse-primary": "#ffb1c2",
+                        "surface-bright": "#fcf9f8",
+                        "on-primary-container": "#ffd9df",
+                        "on-primary-fixed-variant": "#8f003f",
+                        "on-background": "#1c1b1b",
+                        "error": "#ba1a1a",
+                        "on-error-container": "#93000a",
+                        "on-tertiary-fixed": "#3f001b",
+                        "on-secondary-fixed-variant": "#900038",
+                        "on-secondary-fixed": "#400014",
+                        "surface-container-high": "#ebe7e7",
+                        "on-tertiary-container": "#ffd9e1",
+                        "on-primary": "#ffffff",
+                        "primary": "#9b0044",
+                        "on-surface-variant": "#594045",
+                        "on-surface": "#1c1b1b",
+                        "outline-variant": "#e1bec4",
+                        "surface-container": "#f0edec"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "unit": "4px",
+                        "container-max": "1280px",
+                        "margin-mobile": "16px",
+                        "margin-desktop": "64px",
+                        "margin-tablet": "32px",
+                        "gutter": "16px"
+                    },
+                    "fontFamily": {
+                        "label-md": ["Be Vietnam Pro"],
+                        "body-sm": ["Be Vietnam Pro"],
+                        "headline-xl": ["Manrope"],
+                        "headline-lg-mobile": ["Manrope"],
+                        "body-lg": ["Be Vietnam Pro"],
+                        "headline-md": ["Manrope"],
+                        "headline-lg": ["Manrope"],
+                        "headline-sm": ["Manrope"],
+                        "body-md": ["Be Vietnam Pro"]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            background-color: #fcf9f8;
+            font-family: 'Be Vietnam Pro', sans-serif;
+            overflow-x: hidden;
+        }
+        .bento-card {
+            background: #ffffff;
+            box-shadow: 0px 4px 20px rgba(0,0,0,0.04);
+            border-radius: 1rem;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .bento-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0px 8px 30px rgba(0,0,0,0.08);
+        }
+        .chart-container {
+            height: 300px;
+            background: linear-gradient(180deg, rgba(194, 24, 91, 0.05) 0%, rgba(255, 255, 255, 0) 100%);
+        }
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 9999px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        /* Sidebar Transitions */
+        aside {
+            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        main {
+            transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .nav-label {
+            transition: opacity 0.2s ease, visibility 0.2s ease;
+        }
+        .sidebar-collapsed .nav-label, 
+        .sidebar-collapsed .brand-details,
+        .sidebar-collapsed .sidebar-footer-text {
+            opacity: 0;
+            visibility: hidden;
+            width: 0;
+            display: none;
+        }
+        .sidebar-collapsed {
+            width: 80px !important;
+        }
+        .sidebar-collapsed aside nav a {
+            justify-content: center;
+            padding-left: 0;
+            padding-right: 0;
+        }
+        .sidebar-collapsed aside nav a span:first-child {
+            margin-right: 0;
+        }
+        
+        /* Mobile Overlay */
+        #sidebar-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background-color: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(2px);
+            z-index: 45;
+        }
+        #sidebar-overlay.active {
+            display: block;
+        }
+
+        @media (max-width: 1024px) {
+            aside {
+                transform: translateX(-100%);
+                width: 256px !important;
+            }
+            aside.mobile-active {
+                transform: translateX(0);
+            }
+            main {
+                margin-left: 0 !important;
+            }
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface">
+<!-- Overlay for mobile/tablet drawer -->
+<div id="sidebar-overlay" onclick="toggleSidebar()"></div>
+<!-- Side Navigation Bar -->
+<aside class="fixed left-0 top-0 h-screen w-64 bg-surface shadow-sm flex flex-col py-8 px-4 z-50" id="main-sidebar">
+<div class="mb-10 px-2 flex items-center gap-3 overflow-hidden">
+<div class="flex-shrink-0 w-10 h-10 bg-primary rounded-lg flex items-center justify-center text-white">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">texture</span>
+</div>
+<div class="brand-details whitespace-nowrap">
+<h1 class="font-manrope text-headline-sm font-bold text-primary">Bordados Flores</h1>
+<p class="text-[10px] uppercase tracking-widest text-on-surface-variant font-bold">Artisanal Management</p>
+</div>
+</div>
+<nav class="flex-grow space-y-1 overflow-x-hidden">
+<!-- Active Tab: Dashboard -->
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-primary font-bold border-r-4 border-primary bg-surface-container-high transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-beVietnamPro text-body-md nav-label">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="shopping_bag">shopping_bag</span>
+<span class="font-beVietnamPro text-body-md nav-label">Products</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="inventory_2">inventory_2</span>
+<span class="font-beVietnamPro text-body-md nav-label">Inventory</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="receipt_long">receipt_long</span>
+<span class="font-beVietnamPro text-body-md nav-label">Orders</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="analytics">analytics</span>
+<span class="font-beVietnamPro text-body-md nav-label">Analytics</span>
+</a>
+</nav>
+<div class="mt-auto space-y-1 border-t border-surface-container-highest pt-6">
+<button class="w-full mb-4 py-3 bg-primary text-white rounded-xl font-bold flex items-center justify-center gap-2 hover:scale-[1.02] transition-transform active:scale-95 shadow-lg shadow-primary/20">
+<span class="material-symbols-outlined text-sm">add</span>
+<span class="text-label-md nav-label">Add New Product</span>
+</button>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-beVietnamPro text-body-md nav-label">Settings</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="logout">logout</span>
+<span class="font-beVietnamPro text-body-md nav-label">Logout</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="ml-64 min-h-screen" id="main-content">
+<!-- Top Bar -->
+<header class="h-16 bg-surface/80 backdrop-blur-md sticky top-0 px-4 md:px-margin-desktop flex items-center justify-between z-40 border-b border-surface-container-highest/50">
+<div class="flex items-center gap-4 flex-1">
+<button class="w-10 h-10 flex items-center justify-center text-on-surface-variant hover:bg-surface-container rounded-lg transition-colors" onclick="toggleSidebar()">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<div class="flex-1 max-w-md hidden md:block">
+<div class="relative group">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
+<input class="w-full bg-surface-container border-none rounded-full py-2 pl-10 pr-4 text-body-sm focus:ring-2 focus:ring-primary/20 transition-all" placeholder="Search orders, products..." type="text"/>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-4 md:gap-6">
+<button class="text-on-surface-variant hover:text-primary transition-colors relative">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-0 right-0 w-2 h-2 bg-secondary rounded-full"></span>
+</button>
+<button class="hidden sm:block text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">help</span>
+</button>
+<div class="flex items-center gap-3 pl-4 border-l border-surface-container-highest">
+<div class="text-right hidden sm:block">
+<p class="text-label-md font-bold text-on-surface">Admin User</p>
+<p class="text-[10px] text-on-surface-variant">Main Console</p>
+</div>
+<div class="w-10 h-10 rounded-full overflow-hidden bg-surface-container border border-surface-container-highest">
+<img alt="Admin" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuArMXq-XgFBfAdnniclr2r0-QVhysTXtMz72-dhOEqYhsGrHDlZsKcHYB34JrW0zu-sRlFeDXypOh_3-mTY9Veu6PYhkR3U4qyW9FxOtQHUi7Vx497mSuvY0o4PLYZVBye1AwSeUTK3qooI1TSwUShCX7GyUfA-ZZjEFNbmfz6xWKDLZguOZETahdhhQzHsKFqfCEs0lAtn84qCB7JKGaGzPijCHHiF3vWWXqfGn43Xx1Drpy9MeaU"/>
+</div>
+</div>
+</div>
+</header>
+<!-- Dashboard Content -->
+<div class="p-4 md:p-margin-desktop space-y-8">
+<!-- Metric Overview Cards -->
+<section class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-gutter">
+<div class="bento-card p-6 flex flex-col justify-between">
+<div class="flex items-center justify-between mb-4">
+<div class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">payments</span>
+</div>
+<span class="text-green-600 text-label-md font-bold flex items-center gap-1 bg-green-50 px-2 py-1 rounded-full">
+<span class="material-symbols-outlined text-[16px]">trending_up</span> +12.5%
+                        </span>
+</div>
+<div>
+<p class="text-on-surface-variant text-label-md">Ventas Totales</p>
+<h3 class="font-manrope text-headline-md font-bold text-on-surface">Bs. 12,450</h3>
+</div>
+</div>
+<div class="bento-card p-6 flex flex-col justify-between">
+<div class="flex items-center justify-between mb-4">
+<div class="w-12 h-12 rounded-xl bg-secondary/10 flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined">local_shipping</span>
+</div>
+<span class="text-secondary text-label-md font-bold flex items-center gap-1 bg-secondary-fixed px-2 py-1 rounded-full">
+<span class="material-symbols-outlined text-[16px]">pending</span> Active
+                        </span>
+</div>
+<div>
+<p class="text-on-surface-variant text-label-md">Pedidos Activos</p>
+<h3 class="font-manrope text-headline-md font-bold text-on-surface">24</h3>
+</div>
+</div>
+<div class="bento-card p-6 flex flex-col justify-between">
+<div class="flex items-center justify-between mb-4">
+<div class="w-12 h-12 rounded-xl bg-tertiary/10 flex items-center justify-center text-tertiary">
+<span class="material-symbols-outlined">inventory</span>
+</div>
+<span class="text-on-surface-variant text-label-md font-bold">In Stock</span>
+</div>
+<div>
+<p class="text-on-surface-variant text-label-md">Productos en Stock</p>
+<h3 class="font-manrope text-headline-md font-bold text-on-surface">118</h3>
+</div>
+</div>
+<div class="bento-card p-6 flex flex-col justify-between">
+<div class="flex items-center justify-between mb-4">
+<div class="w-12 h-12 rounded-xl bg-on-surface-variant/10 flex items-center justify-center text-on-surface-variant">
+<span class="material-symbols-outlined">visibility</span>
+</div>
+<span class="text-green-600 text-label-md font-bold flex items-center gap-1 bg-green-50 px-2 py-1 rounded-full">
+<span class="material-symbols-outlined text-[16px]">trending_up</span> +5.2%
+                        </span>
+</div>
+<div>
+<p class="text-on-surface-variant text-label-md">Visitas Mensuales</p>
+<h3 class="font-manrope text-headline-md font-bold text-on-surface">2.1k</h3>
+</div>
+</div>
+</section>
+<!-- Main Dashboard Area (Analytics & Inventory) -->
+<section class="grid grid-cols-1 xl:grid-cols-3 gap-gutter">
+<!-- Sales Analytics Chart -->
+<div class="bento-card p-4 md:p-8 xl:col-span-2">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between mb-8 gap-4">
+<div>
+<h2 class="font-manrope text-headline-sm font-bold">Ventas Semanales</h2>
+<p class="text-body-sm text-on-surface-variant">Rendimiento de los últimos 7 días</p>
+</div>
+<div class="flex gap-2">
+<button class="flex-1 sm:flex-none px-4 py-2 bg-surface-container rounded-lg text-label-md font-bold text-primary">Vista Semanal</button>
+<button class="flex-1 sm:flex-none px-4 py-2 text-label-md font-bold text-on-surface-variant hover:bg-surface-container transition-colors rounded-lg">Mensual</button>
+</div>
+</div>
+<div class="chart-container relative rounded-2xl border border-dashed border-primary/20 p-4 flex items-end gap-1 md:gap-2 overflow-hidden">
+<!-- Simulated Chart Visualization -->
+<div class="flex-1 bg-primary/20 rounded-t-lg h-[40%]" title="Mon"></div>
+<div class="flex-1 bg-primary/40 rounded-t-lg h-[65%]" title="Tue"></div>
+<div class="flex-1 bg-primary/30 rounded-t-lg h-[50%]" title="Wed"></div>
+<div class="flex-1 bg-primary/80 rounded-t-lg h-[85%]" title="Thu"></div>
+<div class="flex-1 bg-primary/60 rounded-t-lg h-[70%]" title="Fri"></div>
+<div class="flex-1 bg-primary rounded-t-lg h-[100%]" title="Sat"></div>
+<div class="flex-1 bg-primary/50 rounded-t-lg h-[60%]" title="Sun"></div>
+<div class="absolute inset-x-4 bottom-4 h-full border-b border-surface-container-highest flex flex-col justify-between pointer-events-none opacity-50">
+<div class="border-t border-surface-container-highest w-full h-px"></div>
+<div class="border-t border-surface-container-highest w-full h-px"></div>
+<div class="border-t border-surface-container-highest w-full h-px"></div>
+<div class="border-t border-surface-container-highest w-full h-px"></div>
+</div>
+</div>
+<div class="flex justify-between mt-4 px-2 text-[10px] md:text-label-md text-on-surface-variant font-bold">
+<span>LUN</span><span>MAR</span><span>MIE</span><span>JUE</span><span>VIE</span><span>SAB</span><span>DOM</span>
+</div>
+</div>
+<!-- Inventory Alert Widget -->
+<div class="bento-card p-6 md:p-8 bg-primary-container text-on-primary-container overflow-hidden relative">
+<div class="absolute top-0 right-0 opacity-10 pointer-events-none w-32 h-32 rotate-12">
+<span class="material-symbols-outlined text-[120px]">grid_view</span>
+</div>
+<h2 class="font-manrope text-headline-sm font-bold mb-2">Alertas de Inventario</h2>
+<p class="text-body-sm opacity-80 mb-6">Productos con existencias críticas</p>
+<div class="space-y-4 relative z-10">
+<div class="bg-white/10 backdrop-blur-md p-4 rounded-xl flex items-center gap-4">
+<div class="w-12 h-12 rounded-lg bg-white/20 flex items-center justify-center">
+<span class="material-symbols-outlined">warning</span>
+</div>
+<div class="flex-1 min-w-0">
+<p class="text-body-sm font-bold truncate">Chaqueta Patrón Ancestral</p>
+<p class="text-[12px] opacity-70">SKU: BF-0012</p>
+</div>
+<div class="text-right">
+<p class="text-headline-sm font-bold">2</p>
+<p class="text-[10px] uppercase font-bold">unidades</p>
+</div>
+</div>
+<div class="bg-white/10 backdrop-blur-md p-4 rounded-xl flex items-center gap-4">
+<div class="w-12 h-12 rounded-lg bg-white/20 flex items-center justify-center">
+<span class="material-symbols-outlined">report_problem</span>
+</div>
+<div class="flex-1 min-w-0">
+<p class="text-body-sm font-bold truncate">Bufanda Tejida a Mano</p>
+<p class="text-[12px] opacity-70">SKU: BF-0084</p>
+</div>
+<div class="text-right">
+<p class="text-headline-sm font-bold">5</p>
+<p class="text-[10px] uppercase font-bold">unidades</p>
+</div>
+</div>
+<div class="bg-white/10 backdrop-blur-md p-4 rounded-xl flex items-center gap-4 opacity-75">
+<div class="w-12 h-12 rounded-lg bg-white/20 flex items-center justify-center">
+<span class="material-symbols-outlined">inventory_2</span>
+</div>
+<div class="flex-1 min-w-0">
+<p class="text-body-sm font-bold truncate">Poncho Alpaca Elite</p>
+<p class="text-[12px] opacity-70">SKU: BF-0021</p>
+</div>
+<div class="text-right">
+<p class="text-headline-sm font-bold">8</p>
+<p class="text-[10px] uppercase font-bold">unidades</p>
+</div>
+</div>
+</div>
+<button class="w-full mt-8 py-3 bg-white text-primary rounded-xl font-bold hover:bg-opacity-90 transition-all shadow-lg">
+                        Solicitar Reposición
+                    </button>
+</div>
+</section>
+<!-- Recent Orders Table Section -->
+<section class="bento-card overflow-hidden">
+<div class="p-6 md:p-8 border-b border-surface-container-highest flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+<div>
+<h2 class="font-manrope text-headline-sm font-bold">Pedidos Recientes</h2>
+<p class="text-body-sm text-on-surface-variant">Gestión de transacciones en tiempo real</p>
+</div>
+<button class="px-6 py-2 border-2 border-primary text-primary rounded-lg font-bold hover:bg-primary/5 transition-colors">Ver Todo</button>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left min-w-[800px]">
+<thead class="bg-surface-container-low text-on-surface-variant text-label-md uppercase tracking-wider">
+<tr>
+<th class="px-8 py-4">Order ID</th>
+<th class="px-8 py-4">Client Name</th>
+<th class="px-8 py-4">Date</th>
+<th class="px-8 py-4">Amount</th>
+<th class="px-8 py-4">Status</th>
+<th class="px-8 py-4">Action</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-surface-container-highest">
+<tr class="hover:bg-surface-container-low transition-colors group">
+<td class="px-8 py-5 font-bold text-primary">#BF-9021</td>
+<td class="px-8 py-5">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-secondary/10 flex items-center justify-center text-secondary text-[12px] font-bold">MS</div>
+<span class="text-body-sm font-medium">Mariana Sanchez</span>
+</div>
+</td>
+<td class="px-8 py-5 text-on-surface-variant text-body-sm">Oct 24, 2023</td>
+<td class="px-8 py-5 text-body-sm font-bold">Bs. 850.00</td>
+<td class="px-8 py-5">
+<span class="status-badge bg-green-100 text-green-700">Enviado</span>
+</td>
+<td class="px-8 py-5">
+<button class="w-8 h-8 rounded-full flex items-center justify-center hover:bg-surface-container-highest transition-colors">
+<span class="material-symbols-outlined text-[18px]">more_vert</span>
+</button>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-low transition-colors group">
+<td class="px-8 py-5 font-bold text-primary">#BF-9022</td>
+<td class="px-8 py-5">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary text-[12px] font-bold">RP</div>
+<span class="text-body-sm font-medium">Roberto Poma</span>
+</div>
+</td>
+<td class="px-8 py-5 text-on-surface-variant text-body-sm">Oct 24, 2023</td>
+<td class="px-8 py-5 text-body-sm font-bold">Bs. 1,200.00</td>
+<td class="px-8 py-5">
+<span class="status-badge bg-amber-100 text-amber-700">Pendiente</span>
+</td>
+<td class="px-8 py-5">
+<button class="w-8 h-8 rounded-full flex items-center justify-center hover:bg-surface-container-highest transition-colors">
+<span class="material-symbols-outlined text-[18px]">more_vert</span>
+</button>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-low transition-colors group">
+<td class="px-8 py-5 font-bold text-primary">#BF-9023</td>
+<td class="px-8 py-5">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-tertiary/10 flex items-center justify-center text-tertiary text-[12px] font-bold">AC</div>
+<span class="text-body-sm font-medium">Andrea Calle</span>
+</div>
+</td>
+<td class="px-8 py-5 text-on-surface-variant text-body-sm">Oct 23, 2023</td>
+<td class="px-8 py-5 text-body-sm font-bold">Bs. 450.00</td>
+<td class="px-8 py-5">
+<span class="status-badge bg-blue-100 text-blue-700">Entregado</span>
+</td>
+<td class="px-8 py-5">
+<button class="w-8 h-8 rounded-full flex items-center justify-center hover:bg-surface-container-highest transition-colors">
+<span class="material-symbols-outlined text-[18px]">more_vert</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+</div>
+</main>
+<script>
+        const sidebar = document.getElementById('main-sidebar');
+        const mainContent = document.getElementById('main-content');
+        const overlay = document.getElementById('sidebar-overlay');
+        const body = document.body;
+
+        function toggleSidebar() {
+            const isDesktop = window.innerWidth > 1024;
+            
+            if (isDesktop) {
+                // Desktop: Collapse/Expand
+                body.classList.toggle('sidebar-collapsed');
+                if (body.classList.contains('sidebar-collapsed')) {
+                    mainContent.style.marginLeft = '80px';
+                } else {
+                    mainContent.style.marginLeft = '256px';
+                }
+            } else {
+                // Mobile/Tablet: Slide in drawer
+                sidebar.classList.toggle('mobile-active');
+                overlay.classList.toggle('active');
+            }
+        }
+
+        // Handle window resize logic
+        window.addEventListener('resize', () => {
+            const isDesktop = window.innerWidth > 1024;
+            if (isDesktop) {
+                sidebar.classList.remove('mobile-active');
+                overlay.classList.remove('active');
+                if (body.classList.contains('sidebar-collapsed')) {
+                    mainContent.style.marginLeft = '80px';
+                } else {
+                    mainContent.style.marginLeft = '256px';
+                }
+            } else {
+                mainContent.style.marginLeft = '0';
+            }
+        });
+
+        // Micro-interactions for Dashboard
+        document.querySelectorAll('.bento-card').forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                const icon = card.querySelector('.material-symbols-outlined');
+                if(icon) icon.classList.add('scale-110');
+            });
+            card.addEventListener('mouseleave', () => {
+                const icon = card.querySelector('.material-symbols-outlined');
+                if(icon) icon.classList.remove('scale-110');
+            });
+        });
+
+        // Search bar focus effect
+        const searchInput = document.querySelector('input[type="text"]');
+        if(searchInput) {
+            searchInput.addEventListener('focus', () => {
+                searchInput.parentElement.classList.add('ring-2', 'ring-primary/20');
+            });
+            searchInput.addEventListener('blur', () => {
+                searchInput.parentElement.classList.remove('ring-2', 'ring-primary/20');
+            });
+        }
+    </script>
+</body></html>
