@@ -1,10 +1,12 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Header from '../../components/Header';
-import BottomNav from '../../components/BottomNav';
-import { Product } from '../../data/products';
-import { useCart } from '../../context/CartContext';
+import Header from '@/components/layout/Header';
+import BottomNav from '@/components/layout/BottomNav';
+import { Product } from '@/types/product';
+import { useCart } from '@/context/CartContext';
+import { DEPARTAMENTOS, DESTINATION_LABELS } from '@/lib/constants';
+import { formatCurrency } from '@/lib/utils';
 import { 
   Heart, 
   ChevronLeft, 
@@ -16,7 +18,6 @@ import {
   Layers, 
   Zap, 
   Info, 
-  Star, 
   Lock, 
   ShoppingBasket, 
   Loader2, 
@@ -85,12 +86,6 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
   const currentPrice = (isPollera && isCustomizable)
     ? Math.round((product.price / basePanels) * selectedPanels)
     : product.price;
-
-
-  // Helper to format currency
-  const formatCurrency = (amount: number) => {
-    return `Bs. ${amount.toLocaleString('es-BO')}`;
-  };
 
   // Helper to get estimated delivery date for Polleras (15-20 days from now)
   const getEstimatedDate = () => {
@@ -205,21 +200,9 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
       attributes.push({ label: 'Color', value: product.color_name || 'Tono Único' });
     }
 
-    const destinationLabels: Record<string, string> = {
-      lp: 'La Paz',
-      sc: 'Santa Cruz',
-      cb: 'Cochabamba',
-      or: 'Oruro (Recojo en Tienda/Taller)',
-      pt: 'Potosí',
-      tj: 'Tarija',
-      ch: 'Chuquisaca',
-      bn: 'Beni',
-      pn: 'Pando'
-    };
-
     const shippingDestText = shippingDestination === 'otro'
       ? `Otro Lugar/Provincia: ${customShippingLocation || 'No especificado'}`
-      : (destinationLabels[shippingDestination] || 'No especificado');
+      : (DESTINATION_LABELS[shippingDestination] || 'No especificado');
 
     attributes.push({ label: 'Destino Estimado', value: shippingDestText });
     attributes.push({ label: 'Precio', value: formatCurrency(currentPrice) });
@@ -753,16 +736,11 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                 onChange={(e) => setShippingDestination(e.target.value)}
                 className="w-full bg-surface-container-lowest border border-outline-variant rounded-xl py-3.5 px-5 pr-10 font-body-md font-semibold text-on-surface focus:outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all cursor-pointer appearance-none"
               >
-                <option value="or">Oruro (Recojo en Tienda/Taller)</option>
-                <option value="lp">La Paz</option>
-                <option value="sc">Santa Cruz</option>
-                <option value="cb">Cochabamba</option>
-                <option value="pt">Potosí</option>
-                <option value="tj">Tarija</option>
-                <option value="ch">Chuquisaca</option>
-                <option value="bn">Beni</option>
-                <option value="pn">Pando</option>
-                <option value="otro">Otro (Especificar provincia/lugar)</option>
+                {DEPARTAMENTOS.map((dept) => (
+                  <option key={dept.id} value={dept.id}>
+                    {dept.name}
+                  </option>
+                ))}
               </select>
               <ChevronDown className="w-5 h-5 absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant group-hover:text-primary transition-colors" />
             </div>

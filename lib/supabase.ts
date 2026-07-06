@@ -16,4 +16,3 @@ if (typeof window !== 'undefined') {
     document.cookie = `sb-access-token=${token}; path=/; max-age=${maxAge}; SameSite=Lax; Secure`;
   });
 }
-

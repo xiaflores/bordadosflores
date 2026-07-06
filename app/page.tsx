@@ -1,9 +1,9 @@
-import Header from './components/Header';
-import BottomNav from './components/BottomNav';
-import HeroSlider from './components/HeroSlider';
-import ProductCard from './components/ProductCard';
-import { Product } from './data/products';
-import { supabase } from './lib/supabase';
+import Header from '@/components/layout/Header';
+import BottomNav from '@/components/layout/BottomNav';
+import HeroSlider from '@/components/product/HeroSlider';
+import ProductCard from '@/components/product/ProductCard';
+import { Product } from '@/types/product';
+import { supabase } from '@/lib/supabase';
 
 export default async function Home() {
   // Fetch only featured products (featured = true)

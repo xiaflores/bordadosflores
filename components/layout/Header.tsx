@@ -3,9 +3,9 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { supabase } from '../lib/supabase';
+import { supabase } from '@/lib/supabase';
 import { User } from '@supabase/supabase-js';
-import { useCart } from '../context/CartContext';
+import { useCart } from '@/context/CartContext';
 import { Search, ShoppingBag } from 'lucide-react';
 
 export default function Header() {

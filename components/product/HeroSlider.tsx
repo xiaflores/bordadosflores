@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { mockHeroSlides } from '../data/products';
+import { mockHeroSlides } from '@/data/products';
 
 export default function HeroSlider() {
   const [currentSlide, setCurrentSlide] = useState(0);

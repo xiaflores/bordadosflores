@@ -1,10 +1,10 @@
 import Link from 'next/link';
-import Header from '../components/Header';
-import BottomNav from '../components/BottomNav';
-import ProductCard from '../components/ProductCard';
-import { Product } from '../data/products';
-import { supabase } from '../lib/supabase';
-import SearchInput from './SearchInput';
+import Header from '@/components/layout/Header';
+import BottomNav from '@/components/layout/BottomNav';
+import ProductCard from '@/components/product/ProductCard';
+import { Product } from '@/types/product';
+import { supabase } from '@/lib/supabase';
+import SearchInput from '@/components/catalogo/SearchInput';
 import { Info } from 'lucide-react';
 
 type FilterType = 'Todos' | 'Novedades' | 'Chaquetas' | 'Polleras' | 'Accesorios';

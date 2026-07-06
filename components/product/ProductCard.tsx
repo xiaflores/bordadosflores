@@ -2,8 +2,9 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Product } from '../data/products';
+import { Product } from '@/types/product';
 import { Heart } from 'lucide-react';
+import { formatCurrency } from '@/lib/utils';
 
 interface ProductCardProps {
   product: Product;
@@ -67,11 +68,11 @@ export default function ProductCard({ product }: ProductCardProps) {
           {/* Pricing Layout */}
           <div className="flex items-center gap-2 mt-1">
             <span className="font-bold text-primary">
-              Bs. {product.price.toLocaleString('es-BO')}
+              {formatCurrency(product.price)}
             </span>
             {product.originalPrice && (
               <span className="text-[12px] line-through text-on-surface-variant/50">
-                Bs. {product.originalPrice.toLocaleString('es-BO')}
+                {formatCurrency(product.originalPrice)}
               </span>
             )}
           </div>

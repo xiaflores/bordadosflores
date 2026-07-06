@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
-import { supabase } from '../../lib/supabase';
-import ProductDetailClient from './ProductDetailClient';
+import { supabase } from '@/lib/supabase';
+import ProductDetailClient from '@/components/product/ProductDetailClient';
 
 interface ProductDetailPageProps {
   params: Promise<{ slug: string }>;
