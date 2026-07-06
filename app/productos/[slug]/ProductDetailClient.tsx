@@ -55,7 +55,8 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
     hex: product.color_hex || '#004d40'
   });
   const [selectedPanels, setSelectedPanels] = useState(basePanels);
-  const [selectedLength, setSelectedLength] = useState(product.largo || 45);
+  const [selectedLength, setSelectedLength] = useState<number | 'otro'>(product.largo || 45);
+  const [customLength, setCustomLength] = useState('');
   const [waistMeasurement, setWaistMeasurement] = useState('');
 
   // Jackets Customization
@@ -122,6 +123,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
       price: currentPrice,
       imageUrl: product.imageUrl,
       availability: product.availability,
+      slug: product.slug,
     };
 
     if (isPollera) {
@@ -129,7 +131,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
         cartItemAttributes.colorName = selectedColor.name;
         cartItemAttributes.colorHex = selectedColor.hex;
         cartItemAttributes.panos = selectedPanels;
-        cartItemAttributes.largo = selectedLength;
+        cartItemAttributes.largo = selectedLength === 'otro' ? Number(customLength) || 45 : selectedLength;
         cartItemAttributes.cintura = waistMeasurement || 'No especificada';
         cartItemAttributes.fechaEntrega = getEstimatedDate();
       } else {
@@ -168,17 +170,39 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
 
   // Contact on WhatsApp helper
   const handleWhatsAppConsult = () => {
-    let customText = '';
+    const attributes: { label: string; value: string }[] = [];
+    attributes.push({ label: 'Categoría', value: product.category });
+    attributes.push({ label: 'Disponibilidad', value: product.availability });
+
     if (isPollera) {
-      customText = isCustomizable 
-        ? `Color: ${selectedColor.name}, Paños: ${selectedPanels}, Largo: ${selectedLength}cm, Cintura: ${waistMeasurement || 'No especificada'}cm` 
-        : `Especificaciones fijas de stock: Color: ${product.color_name}, Largo: ${product.largo}cm, Cintura: ${product.cintura}cm, Paños: ${product.panos}`;
+      if (isCustomizable) {
+        attributes.push({ label: 'Color', value: selectedColor.name });
+        attributes.push({ label: 'Paños (Vuelo)', value: `${selectedPanels} paños` });
+        
+        const lengthText = selectedLength === 'otro'
+          ? `${customLength || 'No especificado'} cm (Personalizado)`
+          : `${selectedLength} cm`;
+        attributes.push({ label: 'Largo', value: lengthText });
+        attributes.push({ label: 'Cintura', value: waistMeasurement ? `${waistMeasurement} cm` : 'No especificada' });
+        attributes.push({ label: 'Tiempo de Confección', value: '15-20 días' });
+      } else {
+        attributes.push({ label: 'Color', value: product.color_name || 'Tono Único' });
+        if (product.largo) attributes.push({ label: 'Largo', value: `${product.largo} cm` });
+        if (product.cintura) attributes.push({ label: 'Cintura', value: `${product.cintura} cm` });
+        if (product.panos) attributes.push({ label: 'Paños (Vuelo)', value: `${product.panos} paños` });
+      }
     } else if (isJacket) {
-      customText = isCustomizable
-        ? `Color: ${product.color_name}, Talla Seleccionada: ${selectedJacketSize}, Fecha de Entrega: ${jacketDeliveryDate}`
-        : `Especificaciones fijas de stock: Color: ${product.color_name}, Talla: ${product.talla || 'M'}`;
+      if (isCustomizable) {
+        attributes.push({ label: 'Color', value: product.color_name || 'Tono Único' });
+        attributes.push({ label: 'Talla', value: selectedJacketSize });
+        attributes.push({ label: 'Entrega Estimada', value: jacketDeliveryDate || 'Coordinar' });
+      } else {
+        attributes.push({ label: 'Color', value: product.color_name || 'Tono Único' });
+        attributes.push({ label: 'Talla', value: product.talla || 'M' });
+      }
     } else {
-      customText = `Accesorio en stock: Color: ${product.color_name || 'Tono Único'}`;
+      // Accessories and Textiles
+      attributes.push({ label: 'Color', value: product.color_name || 'Tono Único' });
     }
 
     const destinationLabels: Record<string, string> = {
@@ -197,15 +221,19 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
       ? `Otro Lugar/Provincia: ${customShippingLocation || 'No especificado'}`
       : (destinationLabels[shippingDestination] || 'No especificado');
 
-    const message = `Hola Bordados Flores, estoy interesado en el producto: *${product.name}* (ID: ${product.id}).\n\n` + 
-      `*Categoría:* ${product.category}\n` +
-      `*Disponibilidad:* ${product.availability}\n` +
-      `*Detalles:* ${customText}\n` +
-      `*Destino Estimado:* ${shippingDestText}\n` +
-      `*Precio:* ${formatCurrency(currentPrice)}`;
+    attributes.push({ label: 'Destino Estimado', value: shippingDestText });
+    attributes.push({ label: 'Precio', value: formatCurrency(currentPrice) });
+
+    // Format text: attributes in bold, values in italics, separated by line breaks
+    let message = `Hola Bordados Flores, estoy interesado en el producto:\n`;
+    message += `${window.location.origin}/productos/${product.slug || product.id}\n\n`;
+
+    attributes.forEach(attr => {
+      message += `*${attr.label}:* _${attr.value}_\n`;
+    });
     
     const encodedMessage = encodeURIComponent(message);
-    window.open(`https://wa.me/591?text=${encodedMessage}`, '_blank');
+    window.open(`https://wa.me/59171182580?text=${encodedMessage}`, '_blank');
   };
 
   return (
@@ -377,25 +405,45 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                   </div>
                 </div>
 
-                {/* Length Selection */}
-                <div className="space-y-2">
-                  <label className="font-label-md text-label-md text-on-surface-variant block tracking-wider uppercase">
-                    Talla / Largo de la Pollera
-                  </label>
-                  <div className="relative">
-                    <select
-                      value={selectedLength}
-                      onChange={(e) => setSelectedLength(Number(e.target.value))}
-                      className="w-full bg-surface border border-outline-variant rounded-lg py-3 px-4 pr-10 font-body-md font-semibold text-on-surface focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all cursor-pointer appearance-none"
-                    >
-                      <option value="35">35 cm (Mini)</option>
-                      <option value="40">40 cm (Corto)</option>
-                      <option value="45">45 cm (Medio estándar)</option>
-                      <option value="50">50 cm (Largo tradicional)</option>
-                    </select>
-                    <ChevronDown className="w-5 h-5 absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant" />
+                 {/* Length Selection */}
+                 <div className="space-y-2">
+                   <label className="font-label-md text-label-md text-on-surface-variant block tracking-wider uppercase">
+                     Talla / Largo de la Pollera
+                   </label>
+                   <div className="relative group">
+                     <select
+                       value={selectedLength}
+                       onChange={(e) => {
+                         const val = e.target.value;
+                         setSelectedLength(val === 'otro' ? 'otro' : Number(val));
+                       }}
+                       className="w-full bg-surface border border-outline-variant rounded-lg py-3 px-4 pr-10 font-body-md font-semibold text-on-surface focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all cursor-pointer appearance-none animate-fadeIn"
+                     >
+                       <option value="35">35 cm (Mini/Pequeño)</option>
+                       <option value="38">38 cm (Corto)</option>
+                       <option value="42">42 cm (Medio)</option>
+                       <option value="45">45 cm (Estándar)</option>
+                       <option value="50">50 cm (Tradicional)</option>
+                       <option value="otro">Otro (Especificar en cm)</option>
+                     </select>
+                     <ChevronDown className="w-5 h-5 absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant" />
+                   </div>
+                 </div>
+
+                {selectedLength === 'otro' && (
+                  <div className="space-y-2 pt-1 animate-fadeIn">
+                    <label className="font-label-md text-label-md text-on-surface-variant block tracking-wider uppercase text-xs">
+                      Especificar Largo de la Pollera (cm)
+                    </label>
+                    <input
+                      type="number"
+                      value={customLength}
+                      onChange={(e) => setCustomLength(e.target.value)}
+                      placeholder="Ej. 80"
+                      className="w-full bg-surface border border-outline-variant rounded-lg py-3 px-4 font-body-md text-on-surface focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all"
+                    />
                   </div>
-                </div>
+                )}
 
                 {/* Waist Measurement */}
                 <div className="space-y-2">
@@ -482,11 +530,11 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                   {/* Fixed Panels */}
                   <div>
                     <label className="font-label-md text-label-md text-on-surface-variant block mb-2 tracking-wider uppercase">
-                      VOLUMEN FIJO
+                      PAÑOS / VOLUMEN - FIJO
                     </label>
                     <div className="flex items-center px-5 py-3.5 rounded-xl bg-surface border border-outline-variant/20 font-body-md font-semibold text-on-surface shadow-xs">
                       <Layers className="w-5 h-5 mr-3 text-primary" />
-                      {product.panos || 10} paños premium
+                      {product.panos || 10} paños
                     </div>
                   </div>
 

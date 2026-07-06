@@ -39,7 +39,7 @@ export default async function Home() {
           <a
             title="TikTok"
             className="w-12 h-12 rounded-full bg-[#010101] flex items-center justify-center text-white shadow-[0_4px_12px_rgba(0,0,0,0.15)] hover:shadow-[0_0_15px_rgba(0,242,254,0.4),_0_0_15px_rgba(254,44,85,0.4)] hover:scale-110 active:scale-95 transition-all duration-300 group"
-            href="https://tiktok.com"
+            href="https://tiktok.com/@bordadodosflores"
             target="_blank"
             rel="noopener noreferrer"
           >
@@ -48,7 +48,7 @@ export default async function Home() {
           <a
             title="Instagram"
             className="w-12 h-12 rounded-full bg-gradient-to-tr from-[#f9ce34] via-[#ee2a7b] to-[#6228d7] flex items-center justify-center text-white shadow-[0_4px_12px_rgba(238,42,123,0.25)] hover:shadow-[0_0_20px_rgba(238,42,123,0.5)] hover:scale-110 active:scale-95 transition-all duration-300 group"
-            href="https://instagram.com"
+            href="https://instagram.com/bordadosflores1"
             target="_blank"
             rel="noopener noreferrer"
           >
@@ -57,7 +57,7 @@ export default async function Home() {
           <a
             title="Facebook"
             className="w-12 h-12 rounded-full bg-[#1877F2] flex items-center justify-center text-white shadow-[0_4px_12px_rgba(24,119,242,0.25)] hover:shadow-[0_0_20px_rgba(24,119,242,0.5)] hover:scale-110 active:scale-95 transition-all duration-300 group"
-            href="https://facebook.com"
+            href="https://facebook.com/bordadosflores1"
             target="_blank"
             rel="noopener noreferrer"
           >
@@ -66,7 +66,7 @@ export default async function Home() {
           <a
             title="WhatsApp"
             className="w-12 h-12 rounded-full bg-[#25D366] flex items-center justify-center text-white shadow-[0_4px_12px_rgba(37,211,102,0.25)] hover:shadow-[0_0_20px_rgba(37,211,102,0.5)] hover:scale-110 active:scale-95 transition-all duration-300 group"
-            href="https://wa.me/591"
+            href="https://wa.me/59171182580"
             target="_blank"
             rel="noopener noreferrer"
           >

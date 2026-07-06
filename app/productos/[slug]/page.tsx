@@ -23,8 +23,7 @@ export async function generateMetadata({ params }: ProductDetailPageProps): Prom
   }
 
   return {
-    title: `${product.name} - Bordados Flores`,
-    description: product.description
+    title: `${product.name} - Bordados Flores`
   };
 }
 

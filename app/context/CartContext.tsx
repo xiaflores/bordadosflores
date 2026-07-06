@@ -19,6 +19,7 @@ export interface CartItem {
   cintura?: string | number;
   talla?: string;
   fechaEntrega?: string;
+  slug?: string;
 }
 
 interface CartContextType {

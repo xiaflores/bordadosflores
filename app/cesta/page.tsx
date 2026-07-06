@@ -60,55 +60,58 @@ export default function CestaPage() {
   };
 
   const handleCheckout = () => {
-    const stockItems = cartItems.filter(item => item.availability === 'En Stock');
-    const customItems = cartItems.filter(item => item.availability === 'A Pedido');
-
     let text = `🇧🇴 *NUEVO PEDIDO - BORDADOS FLORES* 🇧🇴\n\n`;
     text += `Hola Bordados Flores, me gustaría coordinar la compra de los siguientes artículos de mi cesta:\n\n`;
 
-    if (stockItems.length > 0) {
-      text += `📦 *ARTÍCULOS EN STOCK* (Entrega en 24-48h):\n`;
-      stockItems.forEach(item => {
-        text += `• *${item.quantity}x ${item.name}* (${item.category})\n`;
-        const attrs = [];
-        if (item.colorName) attrs.push(`Color: ${item.colorName}`);
-        if (item.talla) attrs.push(`Talla: ${item.talla}`);
-        if (item.panos) attrs.push(`Paños: ${item.panos}`);
-        if (item.largo) attrs.push(`Largo: ${item.largo}cm`);
-        if (item.cintura) attrs.push(`Cintura: ${item.cintura}cm`);
-        if (attrs.length > 0) text += `  _${attrs.join(' | ')}_\n`;
-        text += `  _Precio:_ ${formatCurrency(item.price * item.quantity)}\n\n`;
-      });
-    }
+    const formatRow = (label: string, value: string) => {
+      const paddedLabel = label.padEnd(15).substring(0, 15);
+      const paddedValue = value.padEnd(23).substring(0, 23);
+      return `| ${paddedLabel} | ${paddedValue} |\n`;
+    };
 
-    if (customItems.length > 0) {
-      text += `🧶 *ARTÍCULOS A PEDIDO* (Confección artesanal 15-25 días):\n`;
-      customItems.forEach(item => {
-        text += `• *${item.quantity}x ${item.name}* (${item.category})\n`;
-        const attrs = [];
-        if (item.colorName) attrs.push(`Color: ${item.colorName}`);
-        if (item.talla) attrs.push(`Talla: ${item.talla}`);
-        if (item.panos) attrs.push(`Paños: ${item.panos}`);
-        if (item.largo) attrs.push(`Largo: ${item.largo}cm`);
-        if (item.cintura) attrs.push(`Cintura: ${item.cintura}cm`);
-        if (item.fechaEntrega) attrs.push(`Entrega estimada: ${item.fechaEntrega}`);
-        if (attrs.length > 0) text += `  _${attrs.join(' | ')}_\n`;
-        text += `  _Precio:_ ${formatCurrency(item.price * item.quantity)}\n\n`;
-      });
-    }
+    cartItems.forEach((item, index) => {
+      // Build absolute product URL using window.location.origin
+      const productLink = `${window.location.origin}/productos/${item.slug || item.id}`;
+      
+      text += `🛍️ *PRODUCTO #${index + 1}*\n`;
+      text += `${productLink}\n\n`;
+      
+      text += `\`\`\`\n`;
+      text += `+-----------------+-------------------------+\n`;
+      text += formatRow('Detalle', 'Valor');
+      text += `+-----------------+-------------------------+\n`;
+      text += formatRow('Nombre', item.name);
+      text += formatRow('Cantidad', item.quantity + 'x');
+      text += formatRow('Categoría', item.category);
+      text += formatRow('Disponibilidad', item.availability);
+      
+      if (item.colorName) text += formatRow('Color', item.colorName);
+      if (item.talla) text += formatRow('Talla', item.talla);
+      if (item.panos) text += formatRow('Paños', item.panos + '');
+      if (item.largo) text += formatRow('Largo', item.largo + ' cm');
+      if (item.cintura) text += formatRow('Cintura', item.cintura + ' cm');
+      if (item.fechaEntrega) text += formatRow('Confección', item.fechaEntrega);
+      
+      text += formatRow('Precio Unit.', formatCurrency(item.price));
+      text += formatRow('Subtotal', formatCurrency(item.price * item.quantity));
+      text += `+-----------------+-------------------------+\n`;
+      text += `\`\`\`\n\n`;
+    });
 
     const shippingName = selectedDeptId === 'otro' 
       ? `Otro Lugar/Provincia: ${customLocation || 'No especificado'}` 
       : selectedDept.name;
 
-    text += `----------------------------------\n`;
-    text += `📍 *Departamento de Envío:* ${shippingName} (${formatCurrency(selectedDept.costo)})\n`;
-    text += `💰 *Subtotal:* ${formatCurrency(cartSubtotal)}\n`;
-    text += `💵 *Total a Pagar:* ${formatCurrency(total)}\n\n`;
+    text += `==========================================\n`;
+    text += `📍 *Departamento de Envío:* ${shippingName}\n`;
+    text += `💰 *Subtotal Prendas:* ${formatCurrency(cartSubtotal)}\n`;
+    text += `🚚 *Costo de Envío:* ${formatCurrency(selectedDept.costo)}\n`;
+    text += `💵 *TOTAL A PAGAR:* ${formatCurrency(total)}\n`;
+    text += `==========================================\n\n`;
     text += `Por favor, confírmenme los datos para realizar el pago (transferencia o QR) y coordinar el envío. ¡Muchas gracias!`;
 
     const encodedMessage = encodeURIComponent(text);
-    window.open(`https://wa.me/591?text=${encodedMessage}`, '_blank');
+    window.open(`https://wa.me/59171182580?text=${encodedMessage}`, '_blank');
   };
 
   const stockItems = cartItems.filter(item => item.availability === 'En Stock');
