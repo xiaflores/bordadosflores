@@ -3,6 +3,18 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { supabase } from '../lib/supabase';
+import { 
+  Coins, 
+  TrendingUp, 
+  Truck, 
+  Clock, 
+  Package, 
+  Star, 
+  LayoutGrid, 
+  Image as ImageIcon, 
+  CheckCircle, 
+  MoreVertical 
+} from 'lucide-react';
 
 interface InventoryAlert {
   id: string;
@@ -115,10 +127,10 @@ export default function AdminDashboard() {
         <div className="bento-card bg-white p-6 flex flex-col justify-between border border-outline-variant/10 shadow-sm rounded-2xl transition-all duration-300">
           <div className="flex items-center justify-between mb-4">
             <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
-              <span className="material-symbols-outlined">payments</span>
+              <Coins className="w-6 h-6" />
             </div>
             <span className="text-green-600 text-xs font-bold flex items-center gap-1 bg-green-50 px-2.5 py-1 rounded-full">
-              <span className="material-symbols-outlined text-[14px]">trending_up</span> +12.5%
+              <TrendingUp className="w-3.5 h-3.5" /> +12.5%
             </span>
           </div>
           <div>
@@ -131,10 +143,10 @@ export default function AdminDashboard() {
         <div className="bento-card bg-white p-6 flex flex-col justify-between border border-outline-variant/10 shadow-sm rounded-2xl transition-all duration-300">
           <div className="flex items-center justify-between mb-4">
             <div className="w-12 h-12 rounded-xl bg-secondary/10 flex items-center justify-center text-secondary">
-              <span className="material-symbols-outlined">local_shipping</span>
+              <Truck className="w-6 h-6" />
             </div>
             <span className="text-secondary text-xs font-bold flex items-center gap-1 bg-secondary-fixed px-2.5 py-1 rounded-full uppercase tracking-wider">
-              <span className="material-symbols-outlined text-[14px] animate-pulse">pending</span> Activos
+              <Clock className="w-3.5 h-3.5 animate-pulse" /> Activos
             </span>
           </div>
           <div>
@@ -147,7 +159,7 @@ export default function AdminDashboard() {
         <div className="bento-card bg-white p-6 flex flex-col justify-between border border-outline-variant/10 shadow-sm rounded-2xl transition-all duration-300">
           <div className="flex items-center justify-between mb-4">
             <div className="w-12 h-12 rounded-xl bg-tertiary/10 flex items-center justify-center text-tertiary">
-              <span className="material-symbols-outlined">inventory</span>
+              <Package className="w-6 h-6" />
             </div>
             <span className="text-on-surface-variant text-xs font-bold bg-surface-container px-2.5 py-1 rounded-full">
               {inStockCount} / {totalProducts}
@@ -163,7 +175,7 @@ export default function AdminDashboard() {
         <div className="bento-card bg-white p-6 flex flex-col justify-between border border-outline-variant/10 shadow-sm rounded-2xl transition-all duration-300">
           <div className="flex items-center justify-between mb-4">
             <div className="w-12 h-12 rounded-xl bg-on-surface-variant/10 flex items-center justify-center text-on-surface-variant">
-              <span className="material-symbols-outlined">star</span>
+              <Star className="w-6 h-6 text-amber-500 fill-amber-500" />
             </div>
             <span className="text-green-600 text-xs font-bold flex items-center gap-1 bg-green-50 px-2.5 py-1 rounded-full">
               {featuredCount} Destacados
@@ -240,10 +252,8 @@ export default function AdminDashboard() {
 
         {/* Inventory Alert Widget */}
         <div className="bento-card p-6 md:p-8 bg-primary-container text-on-primary-container overflow-hidden relative border border-primary/10 rounded-2xl shadow-sm">
-          <div className="absolute top-0 right-0 opacity-10 pointer-events-none w-32 h-32 rotate-12">
-            <span className="material-symbols-outlined text-[120px] font-fill" style={{ fontVariationSettings: "'FILL' 1" }}>
-              grid_view
-            </span>
+          <div className="absolute top-0 right-0 opacity-10 pointer-events-none w-32 h-32 rotate-12 flex items-center justify-center text-white">
+            <LayoutGrid className="w-28 h-28" />
           </div>
           <h2 className="font-manrope text-headline-sm font-bold mb-2">Alertas de Inventario</h2>
           <p className="text-body-sm opacity-80 mb-6">Productos actualmente a pedido o sin stock</p>
@@ -257,7 +267,7 @@ export default function AdminDashboard() {
                       <img src={alert.imageUrl} alt={alert.name} className="w-full h-full object-cover" />
                     ) : (
                       <div className="w-full h-full bg-primary/10 text-primary flex items-center justify-center">
-                        <span className="material-symbols-outlined text-lg">image</span>
+                        <ImageIcon className="w-5 h-5" />
                       </div>
                     )}
                   </div>
@@ -273,8 +283,8 @@ export default function AdminDashboard() {
                 </div>
               ))
             ) : (
-              <div className="bg-white/10 p-6 rounded-xl text-center">
-                <span className="material-symbols-outlined text-3xl mb-2 text-white">check_circle</span>
+              <div className="bg-white/10 p-6 rounded-xl text-center flex flex-col items-center justify-center">
+                <CheckCircle className="w-8 h-8 mb-2 text-white" />
                 <p className="text-sm font-bold text-white">Todo en Stock</p>
                 <p className="text-xs text-white/70">No hay alertas de disponibilidad críticas.</p>
               </div>
@@ -330,7 +340,7 @@ export default function AdminDashboard() {
                 </td>
                 <td className="px-8 py-5">
                   <button className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-surface-container-highest transition-colors cursor-pointer text-on-surface-variant">
-                    <span className="material-symbols-outlined text-[18px]">more_vert</span>
+                    <MoreVertical className="w-4 h-4" />
                   </button>
                 </td>
               </tr>
@@ -350,7 +360,7 @@ export default function AdminDashboard() {
                 </td>
                 <td className="px-8 py-5">
                   <button className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-surface-container-highest transition-colors cursor-pointer text-on-surface-variant">
-                    <span className="material-symbols-outlined text-[18px]">more_vert</span>
+                    <MoreVertical className="w-4 h-4" />
                   </button>
                 </td>
               </tr>
@@ -370,7 +380,7 @@ export default function AdminDashboard() {
                 </td>
                 <td className="px-8 py-5">
                   <button className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-surface-container-highest transition-colors cursor-pointer text-on-surface-variant">
-                    <span className="material-symbols-outlined text-[18px]">more_vert</span>
+                    <MoreVertical className="w-4 h-4" />
                   </button>
                 </td>
               </tr>

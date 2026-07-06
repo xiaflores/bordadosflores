@@ -2,6 +2,7 @@
 
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useState, useEffect, useTransition } from 'react';
+import { Search, X } from 'lucide-react';
 
 export default function SearchInput({ initialValue }: { initialValue: string }) {
   const router = useRouter();
@@ -36,9 +37,7 @@ export default function SearchInput({ initialValue }: { initialValue: string }) 
 
   return (
     <div className="relative group">
-      <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline group-focus-within:text-primary transition-colors">
-        search
-      </span>
+      <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-outline group-focus-within:text-primary transition-colors w-5 h-5" />
       <input
         type="text"
         value={value}
@@ -49,10 +48,10 @@ export default function SearchInput({ initialValue }: { initialValue: string }) 
       {value && (
         <button
           onClick={() => setValue('')}
-          className="absolute right-4 top-1/2 -translate-y-1/2 text-outline hover:text-primary cursor-pointer"
+          className="absolute right-4 top-1/2 -translate-y-1/2 text-outline hover:text-primary cursor-pointer flex items-center justify-center"
           aria-label="Limpiar búsqueda"
         >
-          <span className="material-symbols-outlined flex items-center justify-center">close</span>
+          <X className="w-5 h-5" />
         </button>
       )}
       {isPending && (

@@ -4,17 +4,46 @@ import { useState, useEffect } from 'react';
 import Header from '../../components/Header';
 import BottomNav from '../../components/BottomNav';
 import { Product } from '../../data/products';
+import { useCart } from '../../context/CartContext';
+import { 
+  Heart, 
+  ChevronLeft, 
+  ChevronRight, 
+  Check, 
+  ChevronDown, 
+  Calendar, 
+  Truck, 
+  Layers, 
+  Zap, 
+  Info, 
+  Star, 
+  Lock, 
+  ShoppingBasket, 
+  Loader2, 
+  CheckCircle, 
+  MessageSquare 
+} from 'lucide-react';
 
 interface ProductDetailClientProps {
   product: Product;
 }
 
 export default function ProductDetailClient({ product }: ProductDetailClientProps) {
+  const { addToCart } = useCart();
   const images = product.images && product.images.length > 0 ? product.images : [product.imageUrl];
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [isFavorite, setIsFavorite] = useState(false);
-  const [shippingDestination, setShippingDestination] = useState('lp');
+  const [shippingDestination, setShippingDestination] = useState('or');
+  const [customShippingLocation, setCustomShippingLocation] = useState('');
   const [cartState, setCartState] = useState<'idle' | 'processing' | 'added'>('idle');
+
+  // Sync shipping destination selection with localStorage for the cart page
+  useEffect(() => {
+    localStorage.setItem('bordados_flores_shipping_dept', shippingDestination);
+    if (shippingDestination === 'otro') {
+      localStorage.setItem('bordados_flores_custom_shipping_location', customShippingLocation);
+    }
+  }, [shippingDestination, customShippingLocation]);
 
   // Customization state for 'A Pedido'
   const isCustomizable = product.availability === 'A Pedido';
@@ -56,14 +85,6 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
     ? Math.round((product.price / basePanels) * selectedPanels)
     : product.price;
 
-  // Swatches for custom colors
-  const colorSwatches = [
-    { name: 'Verde Esmeralda', hex: '#004d40' },
-    { name: 'Fucsia Tradicional', hex: '#d81b60' },
-    { name: 'Azul Royal', hex: '#0d47a1' },
-    { name: 'Rojo Carmín', hex: '#b71c1c' },
-    { name: 'Negro Gala', hex: '#1a1a1a' }
-  ];
 
   // Helper to format currency
   const formatCurrency = (amount: number) => {
@@ -92,12 +113,57 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
 
   const handleAddToCart = () => {
     setCartState('processing');
+    
+    // Construct cart item attributes based on category and customization
+    const cartItemAttributes: any = {
+      id: product.id,
+      name: product.name,
+      category: product.category,
+      price: currentPrice,
+      imageUrl: product.imageUrl,
+      availability: product.availability,
+    };
+
+    if (isPollera) {
+      if (isCustomizable) {
+        cartItemAttributes.colorName = selectedColor.name;
+        cartItemAttributes.colorHex = selectedColor.hex;
+        cartItemAttributes.panos = selectedPanels;
+        cartItemAttributes.largo = selectedLength;
+        cartItemAttributes.cintura = waistMeasurement || 'No especificada';
+        cartItemAttributes.fechaEntrega = getEstimatedDate();
+      } else {
+        cartItemAttributes.colorName = product.color_name || 'Único';
+        cartItemAttributes.colorHex = product.color_hex || '#000000';
+        cartItemAttributes.panos = product.panos;
+        cartItemAttributes.largo = product.largo;
+        cartItemAttributes.cintura = product.cintura || 'Estándar';
+      }
+    } else if (isJacket) {
+      if (isCustomizable) {
+        cartItemAttributes.colorName = product.color_name || 'Único';
+        cartItemAttributes.colorHex = product.color_hex || '#000000';
+        cartItemAttributes.talla = selectedJacketSize;
+        cartItemAttributes.fechaEntrega = jacketDeliveryDate;
+      } else {
+        cartItemAttributes.colorName = product.color_name || 'Único';
+        cartItemAttributes.colorHex = product.color_hex || '#000000';
+        cartItemAttributes.talla = product.talla || 'M';
+      }
+    } else {
+      // Accessories and Textiles
+      cartItemAttributes.colorName = product.color_name || 'Único';
+      cartItemAttributes.colorHex = product.color_hex || '#000000';
+    }
+
+    addToCart(cartItemAttributes);
+
     setTimeout(() => {
       setCartState('added');
       setTimeout(() => {
         setCartState('idle');
       }, 2000);
-    }, 800);
+    }, 600);
   };
 
   // Contact on WhatsApp helper
@@ -115,10 +181,27 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
       customText = `Accesorio en stock: Color: ${product.color_name || 'Tono Único'}`;
     }
 
+    const destinationLabels: Record<string, string> = {
+      lp: 'La Paz',
+      sc: 'Santa Cruz',
+      cb: 'Cochabamba',
+      or: 'Oruro (Recojo en Tienda/Taller)',
+      pt: 'Potosí',
+      tj: 'Tarija',
+      ch: 'Chuquisaca',
+      bn: 'Beni',
+      pn: 'Pando'
+    };
+
+    const shippingDestText = shippingDestination === 'otro'
+      ? `Otro Lugar/Provincia: ${customShippingLocation || 'No especificado'}`
+      : (destinationLabels[shippingDestination] || 'No especificado');
+
     const message = `Hola Bordados Flores, estoy interesado en el producto: *${product.name}* (ID: ${product.id}).\n\n` + 
       `*Categoría:* ${product.category}\n` +
       `*Disponibilidad:* ${product.availability}\n` +
       `*Detalles:* ${customText}\n` +
+      `*Destino Estimado:* ${shippingDestText}\n` +
       `*Precio:* ${formatCurrency(currentPrice)}`;
     
     const encodedMessage = encodeURIComponent(message);
@@ -150,12 +233,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
               }`}
               aria-label="Agregar a favoritos"
             >
-              <span
-                className="material-symbols-outlined text-[24px]"
-                style={{ fontVariationSettings: isFavorite ? '"FILL" 1' : '"FILL" 0' }}
-              >
-                favorite
-              </span>
+              <Heart className="w-6 h-6" fill={isFavorite ? 'currentColor' : 'none'} />
             </button>
 
             {/* Carousel navigation buttons (Desktop/Tablet overlay) */}
@@ -166,14 +244,14 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                   className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/90 text-on-surface p-3 rounded-full shadow-lg backdrop-blur-md hover:bg-white transition-all active:scale-90 z-10 hidden md:flex items-center justify-center"
                   aria-label="Imagen anterior"
                 >
-                  <span className="material-symbols-outlined text-2xl">chevron_left</span>
+                  <ChevronLeft className="w-6 h-6" />
                 </button>
                 <button
                   onClick={handleNextImage}
                   className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/90 text-on-surface p-3 rounded-full shadow-lg backdrop-blur-md hover:bg-white transition-all active:scale-90 z-10 hidden md:flex items-center justify-center"
                   aria-label="Siguiente imagen"
                 >
-                  <span className="material-symbols-outlined text-2xl">chevron_right</span>
+                  <ChevronRight className="w-6 h-6" />
                 </button>
               </>
             )}
@@ -261,32 +339,20 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                   Personalización de la Prenda
                 </h3>
 
-                {/* Color Selection */}
-                <div className="space-y-3">
-                  <label className="font-label-md text-label-md text-on-surface-variant block tracking-wider uppercase">
+                {/* Color Selection (Display fixed color) */}
+                <div className="flex flex-col gap-3">
+                  <label className="font-label-md text-on-surface-variant uppercase tracking-widest text-[12px]">
                     Color de la Tela
                   </label>
-                  <div className="flex flex-wrap items-center gap-3">
-                    {colorSwatches.map((color) => (
-                      <button
-                        key={color.name}
-                        onClick={() => setSelectedColor(color)}
-                        className={`w-10 h-10 rounded-full border-2 transition-all relative flex items-center justify-center active:scale-90 ${
-                          selectedColor.name === color.name
-                            ? 'border-primary ring-4 ring-primary/10 scale-105 shadow-md'
-                            : 'border-transparent hover:scale-105 shadow-xs'
-                        }`}
-                        style={{ backgroundColor: color.hex }}
-                        title={color.name}
-                      >
-                        {selectedColor.name === color.name && (
-                          <span className="material-symbols-outlined text-white text-[16px] font-bold">check</span>
-                        )}
-                      </button>
-                    ))}
-                  </div>
-                  <div className="text-body-sm text-primary font-semibold">
-                    Seleccionado: {selectedColor.name}
+                  <div className="flex items-center gap-3 p-4 bg-white border border-outline-variant rounded-xl">
+                    <div 
+                      className="w-6 h-6 rounded-full border border-black/10 shrink-0" 
+                      style={{ backgroundColor: selectedColor.hex }}
+                    />
+                    <span className="font-body-md text-on-surface font-semibold">
+                      {selectedColor.name}
+                    </span>
+                    <Check className="w-4 h-4 ml-auto text-primary" />
                   </div>
                 </div>
 
@@ -307,9 +373,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                       <option value="12">12 paños ({formatCurrency(Math.round((product.price / basePanels) * 12))})</option>
                       <option value="14">14 paños ({formatCurrency(Math.round((product.price / basePanels) * 14))})</option>
                     </select>
-                    <span className="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant">
-                      expand_more
-                    </span>
+                    <ChevronDown className="w-5 h-5 absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant" />
                   </div>
                 </div>
 
@@ -329,9 +393,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                       <option value="45">45 cm (Medio estándar)</option>
                       <option value="50">50 cm (Largo tradicional)</option>
                     </select>
-                    <span className="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant">
-                      expand_more
-                    </span>
+                    <ChevronDown className="w-5 h-5 absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant" />
                   </div>
                 </div>
 
@@ -351,7 +413,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
 
                 {/* Delivery Warning Box */}
                 <div className="flex gap-3.5 p-4.5 bg-primary/5 rounded-lg border border-primary/20">
-                  <span className="material-symbols-outlined text-primary text-xl">calendar_today</span>
+                  <Calendar className="w-5 h-5 text-primary" />
                   <div>
                     <p className="font-bold text-primary text-body-sm">Tiempo de confección: 15-20 días</p>
                     <p className="text-on-surface-variant text-[11px]">
@@ -367,7 +429,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                   </label>
                   <div className="p-4 bg-surface rounded-lg border border-outline-variant flex items-center justify-between">
                     <span className="font-semibold text-on-surface">{getEstimatedDate()}</span>
-                    <span className="material-symbols-outlined text-on-surface-variant">event</span>
+                    <Calendar className="w-5 h-5 text-on-surface-variant" />
                   </div>
                 </div>
               </section>
@@ -389,7 +451,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                         className="w-10 h-10 rounded-full border border-primary/20 flex items-center justify-center shadow-sm"
                         style={{ backgroundColor: product.color_hex || '#004d40' }}
                       >
-                        <span className="material-symbols-outlined text-white text-[16px]">check</span>
+                        <Check className="w-4 h-4 text-white" />
                       </div>
                       <span className="font-body-md text-on-surface font-semibold">
                         {product.color_name || 'Verde Esmeralda Deep'}
@@ -423,7 +485,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                       VOLUMEN FIJO
                     </label>
                     <div className="flex items-center px-5 py-3.5 rounded-xl bg-surface border border-outline-variant/20 font-body-md font-semibold text-on-surface shadow-xs">
-                      <span className="material-symbols-outlined mr-3 text-primary">layers</span>
+                      <Layers className="w-5 h-5 mr-3 text-primary" />
                       {product.panos || 10} paños premium
                     </div>
                   </div>
@@ -434,14 +496,14 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                       DISPONIBILIDAD
                     </label>
                     <div className="flex items-center gap-2 text-primary bg-primary/5 p-3.5 rounded-lg border border-primary/20">
-                      <span className="material-symbols-outlined text-[24px]">bolt</span>
+                      <Zap className="w-5 h-5" />
                       <span className="font-headline-sm text-base uppercase tracking-wider font-bold">ENVÍO INMEDIATO</span>
                     </div>
                   </div>
                 </div>
 
                 <div className="p-4.5 bg-surface rounded-xl border-l-4 border-primary flex gap-3.5 shadow-xs">
-                  <span className="material-symbols-outlined text-primary text-xl mt-0.5">info</span>
+                  <Info className="w-5 h-5 text-primary shrink-0 mt-0.5" />
                   <p className="text-body-sm font-body-sm text-on-surface-variant leading-relaxed">
                     Esta es una pieza artesanal única de entrega inmediata. <span className="font-bold text-on-surface">No admite personalizaciones adicionales</span> ni modificaciones.
                   </p>
@@ -465,9 +527,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                     Color Seleccionado
                   </label>
                   <div className="flex items-center gap-3 p-4 bg-white border border-outline-variant rounded-xl">
-                    <span className="material-symbols-outlined text-primary" style={{ fontVariationSettings: '"FILL" 1' }}>
-                      check_circle
-                    </span>
+                    <CheckCircle className="w-5 h-5 text-primary" />
                     <span className="font-body-md text-on-surface font-medium">
                       {product.color_name || 'Carmesí Ancestral'}
                     </span>
@@ -509,15 +569,13 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                       onChange={(e) => setJacketDeliveryDate(e.target.value)}
                       className="w-full p-4 pr-12 bg-white border border-outline-variant rounded-xl font-body-md text-on-surface focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all cursor-pointer"
                     />
-                    <span className="absolute right-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-outline pointer-events-none group-focus-within:text-primary">
-                      calendar_today
-                    </span>
+                    <Calendar className="w-5 h-5 absolute right-4 top-1/2 -translate-y-1/2 text-outline pointer-events-none group-focus-within:text-primary" />
                   </div>
                 </div>
 
                 {/* Confection Info */}
                 <div className="flex gap-4 p-5 bg-primary/5 rounded-xl border border-primary/20">
-                  <span className="material-symbols-outlined text-primary shrink-0">info</span>
+                  <Info className="w-5 h-5 text-primary shrink-0" />
                   <div className="flex flex-col gap-1">
                     <p className="font-bold text-primary text-body-md">Tiempo de confección: 15-20 días</p>
                     <p className="font-body-sm text-on-surface-variant leading-relaxed">
@@ -544,14 +602,12 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                         className="w-8 h-8 rounded-full bg-secondary shadow-inner flex items-center justify-center"
                         style={{ backgroundColor: product.color_hex || '#c2185b' }}
                       >
-                        <span className="material-symbols-outlined text-white text-sm" style={{ fontVariationSettings: '"FILL" 1' }}>
-                          check
-                        </span>
+                        <Check className="w-4 h-4 text-white" />
                       </div>
                       <span className="font-body-md text-body-md font-semibold">
                         {product.color_name || 'Carmesí Ancestral'}
                       </span>
-                      <span className="ml-auto material-symbols-outlined text-outline text-sm">lock</span>
+                      <Lock className="w-4 h-4 ml-auto text-outline" />
                     </div>
                   </div>
 
@@ -565,7 +621,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                         {product.talla || 'M'}
                       </div>
                       <span className="font-body-md text-body-md font-semibold">Talla Única de Stock</span>
-                      <span className="ml-auto material-symbols-outlined text-outline text-sm">lock</span>
+                      <Lock className="w-4 h-4 ml-auto text-outline" />
                     </div>
                   </div>
 
@@ -575,9 +631,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                       Disponibilidad
                     </label>
                     <div className="flex items-center gap-2 text-primary font-bold">
-                      <span className="material-symbols-outlined" style={{ fontVariationSettings: '"FILL" 1' }}>
-                        local_shipping
-                      </span>
+                      <Truck className="w-5 h-5" />
                       <span className="font-body-md text-body-md">ENTREGA INMEDIATA</span>
                     </div>
                   </div>
@@ -616,7 +670,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                       className="w-6 h-6 rounded-full flex items-center justify-center"
                       style={{ backgroundColor: product.color_hex || '#c2185b' }}
                     >
-                      <span className="material-symbols-outlined text-[14px] text-white">check</span>
+                      <Check className="w-3.5 h-3.5 text-white" />
                     </div>
                     <span className="font-body-md font-semibold text-on-surface">
                       {product.color_name || 'Tono Único'}
@@ -628,7 +682,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
               {/* Delivery Confection warning (if A Pedido accessory) */}
               {isCustomizable && (
                 <div className="flex gap-4 p-5 bg-primary/5 rounded-xl border border-primary/20">
-                  <span className="material-symbols-outlined text-primary shrink-0">info</span>
+                  <Info className="w-5 h-5 text-primary shrink-0" />
                   <div className="flex flex-col gap-1">
                     <p className="font-bold text-primary text-body-md">Tiempo de confección: 10-15 días</p>
                     <p className="font-body-sm text-on-surface-variant leading-relaxed">
@@ -651,21 +705,34 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                 onChange={(e) => setShippingDestination(e.target.value)}
                 className="w-full bg-surface-container-lowest border border-outline-variant rounded-xl py-3.5 px-5 pr-10 font-body-md font-semibold text-on-surface focus:outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all cursor-pointer appearance-none"
               >
-                <option value="lp">La Paz (Sede Central)</option>
+                <option value="or">Oruro (Recojo en Tienda/Taller)</option>
+                <option value="lp">La Paz</option>
                 <option value="sc">Santa Cruz</option>
                 <option value="cb">Cochabamba</option>
-                <option value="or">Oruro</option>
                 <option value="pt">Potosí</option>
                 <option value="tj">Tarija</option>
                 <option value="ch">Chuquisaca</option>
                 <option value="bn">Beni</option>
                 <option value="pn">Pando</option>
-                <option value="pickup">Recojo en Taller (La Paz)</option>
+                <option value="otro">Otro (Especificar provincia/lugar)</option>
               </select>
-              <span className="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant group-hover:text-primary transition-colors">
-                expand_more
-              </span>
+              <ChevronDown className="w-5 h-5 absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant group-hover:text-primary transition-colors" />
             </div>
+
+            {shippingDestination === 'otro' && (
+              <div className="space-y-2 pt-1">
+                <label className="font-label-md text-label-md text-on-surface-variant block tracking-wider uppercase text-xs">
+                  Especificar Lugar o Provincia
+                </label>
+                <input
+                  type="text"
+                  value={customShippingLocation}
+                  onChange={(e) => setCustomShippingLocation(e.target.value)}
+                  placeholder="Ej. Challapata, Oruro / Copacabana, La Paz"
+                  className="w-full bg-surface-container-lowest border border-outline-variant rounded-xl py-3 px-4 font-body-md text-on-surface focus:outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all placeholder:text-on-surface-variant/40"
+                />
+              </div>
+            )}
           </div>
 
           {/* CTAs */}
@@ -681,19 +748,19 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
             >
               {cartState === 'idle' && (
                 <>
-                  <span className="material-symbols-outlined">shopping_basket</span>
+                  <ShoppingBasket className="w-5 h-5" />
                   Añadir a la Cesta
                 </>
               )}
               {cartState === 'processing' && (
                 <>
-                  <span className="material-symbols-outlined animate-spin">sync</span>
+                  <Loader2 className="w-5 h-5 animate-spin" />
                   Procesando...
                 </>
               )}
               {cartState === 'added' && (
                 <>
-                  <span className="material-symbols-outlined">check_circle</span>
+                  <CheckCircle className="w-5 h-5" />
                   ¡En tu cesta!
                 </>
               )}
@@ -703,7 +770,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
               onClick={handleWhatsAppConsult}
               className="w-full h-16 border-2 border-primary text-primary hover:bg-primary/5 font-headline-sm rounded-xl active:scale-[0.98] transition-all font-semibold uppercase tracking-wider flex items-center justify-center gap-3 cursor-pointer"
             >
-              <span className="material-symbols-outlined">chat</span>
+              <MessageSquare className="w-5 h-5" />
               Consultar Detalles
             </button>
           </div>

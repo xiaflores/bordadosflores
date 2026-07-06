@@ -3,6 +3,16 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { supabase } from '../../lib/supabase';
+import { 
+  Plus, 
+  Search, 
+  ChevronDown, 
+  Image as ImageIcon, 
+  Pencil, 
+  Trash2, 
+  ChevronLeft, 
+  ChevronRight 
+} from 'lucide-react';
 
 interface Product {
   id: string;
@@ -145,7 +155,7 @@ export default function AdminProductsPage() {
           href="/admin/productos/nuevo"
           className="w-full sm:w-auto flex items-center justify-center gap-2 px-8 py-4 bg-primary text-white rounded-xl font-bold hover:opacity-90 active:scale-95 transition-all shadow-lg shadow-primary/20 shrink-0 cursor-pointer text-sm"
         >
-          <span className="material-symbols-outlined">add</span>
+          <Plus className="w-4 h-4" />
           Añadir Producto
         </Link>
       </div>
@@ -153,9 +163,7 @@ export default function AdminProductsPage() {
       {/* Real-time search and filter controls */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 bg-white p-4 rounded-xl border border-outline-variant/10 shadow-sm">
         <div className="relative md:col-span-2">
-          <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-lg">
-            search
-          </span>
+          <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant" />
           <input
             className="w-full bg-surface-container-low border-none rounded-xl py-3 pl-10 pr-4 text-sm focus:ring-2 focus:ring-primary/20 transition-all focus:bg-white focus:outline-none"
             placeholder="Buscar por nombre, categoría o SKU/ID..."
@@ -164,9 +172,9 @@ export default function AdminProductsPage() {
             onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
-        <div className="relative">
+        <div className="relative text-on-surface-variant">
           <select
-            className="w-full bg-surface-container-low border-none rounded-xl py-3 px-4 text-sm focus:ring-2 focus:ring-primary/20 transition-all focus:bg-white appearance-none focus:outline-none"
+            className="w-full bg-surface-container-low border-none rounded-xl py-3 px-4 text-sm focus:ring-2 focus:ring-primary/20 transition-all focus:bg-white appearance-none focus:outline-none text-on-surface"
             value={categoryFilter}
             onChange={(e) => setCategoryFilter(e.target.value)}
           >
@@ -176,9 +184,7 @@ export default function AdminProductsPage() {
             <option value="accesorios">Accesorios</option>
             <option value="textiles">Textiles</option>
           </select>
-          <span className="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant">
-            expand_more
-          </span>
+          <ChevronDown className="w-5 h-5 absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none" />
         </div>
       </div>
 
@@ -209,7 +215,7 @@ export default function AdminProductsPage() {
                           <img alt={product.name} className="w-full h-full object-cover" src={product.imageUrl} />
                         ) : (
                           <div className="w-full h-full bg-primary/10 text-primary flex items-center justify-center">
-                            <span className="material-symbols-outlined text-lg">image</span>
+                            <ImageIcon className="w-5 h-5" />
                           </div>
                         )}
                       </div>
@@ -252,17 +258,17 @@ export default function AdminProductsPage() {
                       <div className="flex justify-end gap-1">
                         <Link
                           href={`/admin/productos/${product.id}`}
-                          className="p-2 text-on-surface-variant hover:text-primary hover:bg-primary/5 rounded-lg transition-all"
+                          className="p-2 text-on-surface-variant hover:text-primary hover:bg-primary/5 rounded-lg transition-all flex items-center justify-center"
                           title="Editar"
                         >
-                          <span className="material-symbols-outlined text-xl">edit</span>
+                          <Pencil className="w-5 h-5" />
                         </Link>
                         <button
                           onClick={() => handleDelete(product.id, product.name)}
-                          className="p-2 text-on-surface-variant hover:text-red-600 hover:bg-red-50 rounded-lg transition-all cursor-pointer"
+                          className="p-2 text-on-surface-variant hover:text-red-600 hover:bg-red-50 rounded-lg transition-all cursor-pointer flex items-center justify-center"
                           title="Eliminar"
                         >
-                          <span className="material-symbols-outlined text-xl">delete</span>
+                          <Trash2 className="w-5 h-5" />
                         </button>
                       </div>
                     </td>
@@ -290,7 +296,7 @@ export default function AdminProductsPage() {
                       <img alt={product.name} className="w-full h-full object-cover" src={product.imageUrl} />
                     ) : (
                       <div className="w-full h-full bg-primary/10 text-primary flex items-center justify-center">
-                        <span className="material-symbols-outlined text-xl">image</span>
+                        <ImageIcon className="w-5 h-5" />
                       </div>
                     )}
                   </div>
@@ -302,15 +308,15 @@ export default function AdminProductsPage() {
                       <div className="flex gap-1">
                         <Link
                           href={`/admin/productos/${product.id}`}
-                          className="p-1.5 text-on-surface-variant hover:text-primary transition-all"
+                          className="p-1.5 text-on-surface-variant hover:text-primary transition-all flex items-center justify-center"
                         >
-                          <span className="material-symbols-outlined text-lg">edit</span>
+                          <Pencil className="w-4 h-4" />
                         </Link>
                         <button
                           onClick={() => handleDelete(product.id, product.name)}
-                          className="p-1.5 text-on-surface-variant hover:text-red-600 transition-all cursor-pointer"
+                          className="p-1.5 text-on-surface-variant hover:text-red-600 transition-all cursor-pointer flex items-center justify-center"
                         >
-                          <span className="material-symbols-outlined text-lg">delete</span>
+                          <Trash2 className="w-4 h-4" />
                         </button>
                       </div>
                     </div>
@@ -361,7 +367,7 @@ export default function AdminProductsPage() {
                 disabled={currentPage === 1}
                 className="w-9 h-9 flex items-center justify-center rounded-lg border border-outline-variant/30 text-on-surface-variant hover:border-primary hover:text-primary transition-all disabled:opacity-50 disabled:pointer-events-none cursor-pointer"
               >
-                <span className="material-symbols-outlined text-lg">chevron_left</span>
+                <ChevronLeft className="w-5 h-5" />
               </button>
               
               {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
@@ -383,7 +389,7 @@ export default function AdminProductsPage() {
                 disabled={currentPage === totalPages}
                 className="w-9 h-9 flex items-center justify-center rounded-lg border border-outline-variant/30 text-on-surface-variant hover:border-primary hover:text-primary transition-all disabled:opacity-50 disabled:pointer-events-none cursor-pointer"
               >
-                <span className="material-symbols-outlined text-lg">chevron_right</span>
+                <ChevronRight className="w-5 h-5" />
               </button>
             </div>
           )}

@@ -4,16 +4,16 @@ import { supabase } from '../../lib/supabase';
 import ProductDetailClient from './ProductDetailClient';
 
 interface ProductDetailPageProps {
-  params: Promise<{ id: string }>;
+  params: Promise<{ slug: string }>;
 }
 
 export async function generateMetadata({ params }: ProductDetailPageProps): Promise<Metadata> {
-  const { id } = await params;
+  const { slug } = await params;
   
   const { data: product } = await supabase
     .from('productos')
     .select('name,description')
-    .eq('id', id)
+    .eq('slug', slug)
     .single();
 
   if (!product) {
@@ -29,13 +29,13 @@ export async function generateMetadata({ params }: ProductDetailPageProps): Prom
 }
 
 export default async function ProductDetailPage({ params }: ProductDetailPageProps) {
-  const { id } = await params;
+  const { slug } = await params;
 
   // Fetch the product from Supabase database
   const { data: product, error } = await supabase
     .from('productos')
     .select('*')
-    .eq('id', id)
+    .eq('slug', slug)
     .single();
 
   if (error || !product) {
@@ -45,3 +45,4 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
 
   return <ProductDetailClient product={product} />;
 }
+

@@ -5,6 +5,22 @@ import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { supabase } from '../lib/supabase';
 import { User } from '@supabase/supabase-js';
+import { 
+  LayoutGrid, 
+  X, 
+  LayoutDashboard, 
+  Package, 
+  ClipboardList, 
+  ShoppingCart, 
+  BarChart3, 
+  Plus, 
+  Store, 
+  LogOut, 
+  Menu, 
+  Search, 
+  Bell, 
+  HelpCircle 
+} from 'lucide-react';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -69,6 +85,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  // Close mobile sidebar on route changes
+  useEffect(() => {
+    setMobileSidebarActive(false);
+  }, [pathname]);
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-surface artisanal-bg">
@@ -98,19 +119,17 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
       {/* Side Navigation Bar */}
       <aside
-        className={`fixed left-0 top-0 h-screen bg-white shadow-sm flex flex-col py-8 px-4 z-50 transition-all duration-300 border-r border-outline-variant/30 ${
+        className={`fixed left-0 top-0 h-screen bg-white shadow-sm flex flex-col py-8 px-4 z-50 transition-all duration-300 border-r border-outline-variant/30 w-64 ${
           mobileSidebarActive
-            ? 'translate-x-0 w-64'
-            : 'max-lg:-translate-x-full lg:w-64'
-        } ${sidebarCollapsed && 'lg:w-20'}`}
+            ? 'translate-x-0'
+            : '-translate-x-full lg:translate-x-0'
+        } ${sidebarCollapsed ? 'lg:w-20' : 'lg:w-64'}`}
       >
         {/* Brand Details */}
         <div className="mb-10 px-2 flex items-center justify-between overflow-hidden">
           <div className="flex items-center gap-3">
             <div className="flex-shrink-0 w-10 h-10 bg-primary rounded-lg flex items-center justify-center text-white">
-              <span className="material-symbols-outlined font-fill" style={{ fontVariationSettings: "'FILL' 1" }}>
-                texture
-              </span>
+              <LayoutGrid className="w-5 h-5" />
             </div>
             {!sidebarCollapsed && (
               <div className="brand-details whitespace-nowrap animate-fade-in">
@@ -122,9 +141,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           {mobileSidebarActive && (
             <button
               onClick={() => setMobileSidebarActive(false)}
-              className="p-2 text-on-surface-variant hover:text-primary transition-colors lg:hidden"
+              className="p-2 text-on-surface-variant hover:text-primary transition-colors lg:hidden flex items-center justify-center"
             >
-              <span className="material-symbols-outlined">close</span>
+              <X className="w-5 h-5" />
             </button>
           )}
         </div>
@@ -139,9 +158,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 : 'text-on-surface-variant hover:bg-surface-container-high hover:text-primary'
             }`}
           >
-            <span className="material-symbols-outlined" style={{ fontVariationSettings: pathname === '/admin' ? "'FILL' 1" : undefined }}>
-              dashboard
-            </span>
+            <LayoutDashboard className="w-5 h-5 shrink-0" fill={pathname === '/admin' ? 'currentColor' : 'none'} />
             {!sidebarCollapsed && <span className="font-beVietnamPro text-body-md">Dashboard</span>}
           </Link>
 
@@ -153,9 +170,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 : 'text-on-surface-variant hover:bg-surface-container-high hover:text-primary'
             }`}
           >
-            <span className="material-symbols-outlined" style={{ fontVariationSettings: pathname.startsWith('/admin/productos') ? "'FILL' 1" : undefined }}>
-              inventory_2
-            </span>
+            <Package className="w-5 h-5 shrink-0" fill={pathname.startsWith('/admin/productos') ? 'currentColor' : 'none'} />
             {!sidebarCollapsed && <span className="font-beVietnamPro text-body-md">Productos</span>}
           </Link>
 
@@ -163,7 +178,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             href="#"
             className="flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-primary transition-all"
           >
-            <span className="material-symbols-outlined">reorder</span>
+            <ClipboardList className="w-5 h-5 shrink-0" />
             {!sidebarCollapsed && <span className="font-beVietnamPro text-body-md">Inventario</span>}
           </Link>
 
@@ -171,7 +186,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             href="#"
             className="flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-primary transition-all"
           >
-            <span className="material-symbols-outlined">shopping_cart</span>
+            <ShoppingCart className="w-5 h-5 shrink-0" />
             {!sidebarCollapsed && <span className="font-beVietnamPro text-body-md">Pedidos</span>}
           </Link>
 
@@ -179,7 +194,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             href="#"
             className="flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-primary transition-all"
           >
-            <span className="material-symbols-outlined">analytics</span>
+            <BarChart3 className="w-5 h-5 shrink-0" />
             {!sidebarCollapsed && <span className="font-beVietnamPro text-body-md">Estadísticas</span>}
           </Link>
         </nav>
@@ -192,7 +207,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               sidebarCollapsed ? 'px-0' : 'px-4'
             }`}
           >
-            <span className="material-symbols-outlined text-sm">add</span>
+            <Plus className="w-4 h-4" />
             {!sidebarCollapsed && <span className="text-label-md">Añadir Producto</span>}
           </Link>
 
@@ -200,7 +215,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             href="/"
             className="flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-primary transition-colors"
           >
-            <span className="material-symbols-outlined">storefront</span>
+            <Store className="w-5 h-5 shrink-0" />
             {!sidebarCollapsed && <span className="font-beVietnamPro text-body-md">Ver Tienda</span>}
           </Link>
 
@@ -208,7 +223,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             onClick={handleSignOut}
             className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant hover:text-error hover:bg-error-container/10 transition-colors text-left"
           >
-            <span className="material-symbols-outlined">logout</span>
+            <LogOut className="w-5 h-5 shrink-0" />
             {!sidebarCollapsed && <span className="font-beVietnamPro text-body-md">Cerrar Sesión</span>}
           </button>
         </div>
@@ -224,13 +239,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               onClick={toggleSidebar}
               className="w-10 h-10 flex items-center justify-center text-on-surface-variant hover:bg-surface-container rounded-lg transition-colors cursor-pointer"
             >
-              <span className="material-symbols-outlined">menu</span>
+              <Menu className="w-5 h-5" />
             </button>
             <div className="flex-1 hidden md:block">
               <div className="relative group">
-                <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-lg">
-                  search
-                </span>
+                <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant" />
                 <input
                   className="w-full bg-surface-container-low border-none rounded-full py-2 pl-10 pr-4 text-body-sm focus:ring-2 focus:ring-primary/20 transition-all focus:bg-white"
                   placeholder="Buscar pedidos, productos..."
@@ -241,12 +254,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           </div>
 
           <div className="flex items-center gap-4 md:gap-6 shrink-0">
-            <button className="text-on-surface-variant hover:text-primary transition-colors relative cursor-pointer">
-              <span className="material-symbols-outlined">notifications</span>
+            <button className="text-on-surface-variant hover:text-primary transition-colors relative cursor-pointer flex items-center justify-center">
+              <Bell className="w-5 h-5" />
               <span className="absolute top-0 right-0 w-2 h-2 bg-secondary rounded-full"></span>
             </button>
-            <button className="hidden sm:block text-on-surface-variant hover:text-primary transition-colors cursor-pointer">
-              <span className="material-symbols-outlined">help</span>
+            <button className="hidden sm:block text-on-surface-variant hover:text-primary transition-colors cursor-pointer flex items-center justify-center">
+              <HelpCircle className="w-5 h-5" />
             </button>
 
             <div className="flex items-center gap-3 pl-4 border-l border-surface-container-highest">

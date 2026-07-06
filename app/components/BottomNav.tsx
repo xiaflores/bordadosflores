@@ -5,10 +5,13 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { supabase } from '../lib/supabase';
 import { User } from '@supabase/supabase-js';
+import { useCart } from '../context/CartContext';
+import { Home, BookOpen, ShoppingCart, User as UserIcon } from 'lucide-react';
 
 export default function BottomNav() {
   const pathname = usePathname();
   const [user, setUser] = useState<User | null>(null);
+  const { cartCount, isLoaded } = useCart();
 
   useEffect(() => {
     // Get initial session
@@ -46,12 +49,7 @@ export default function BottomNav() {
             : 'text-on-secondary/70 hover:bg-on-secondary/10 rounded-lg p-1'
         }`}
       >
-        <span
-          className="material-symbols-outlined"
-          style={{ fontVariationSettings: activeTab === 'inicio' ? '"FILL" 1' : undefined }}
-        >
-          home
-        </span>
+        <Home className="w-6 h-6" fill={activeTab === 'inicio' ? 'currentColor' : 'none'} />
         <span className="font-label-md text-label-md mt-1">Inicio</span>
       </Link>
 
@@ -63,33 +61,25 @@ export default function BottomNav() {
             : 'text-on-secondary/70 hover:bg-on-secondary/10 rounded-lg p-1'
         }`}
       >
-        <span
-          className="material-symbols-outlined"
-          style={{ fontVariationSettings: activeTab === 'catalogo' ? '"FILL" 1' : undefined }}
-        >
-          menu_book
-        </span>
+        <BookOpen className="w-6 h-6" fill={activeTab === 'catalogo' ? 'currentColor' : 'none'} />
         <span className="font-label-md text-label-md mt-1">Catálogo</span>
       </Link>
 
       <Link
-        href="#"
+        href="/cesta"
         className={`flex flex-col items-center justify-center transition-all duration-300 ease-out active:scale-90 relative ${
           activeTab === 'cesta'
             ? 'scale-110 text-on-secondary font-bold'
             : 'text-on-secondary/70 hover:bg-on-secondary/10 rounded-lg p-1'
         }`}
       >
-        <span
-          className="material-symbols-outlined"
-          style={{ fontVariationSettings: activeTab === 'cesta' ? '"FILL" 1' : undefined }}
-        >
-          shopping_cart
-        </span>
+        <ShoppingCart className="w-6 h-6" fill={activeTab === 'cesta' ? 'currentColor' : 'none'} />
         <span className="font-label-md text-label-md mt-1">Cesta</span>
-        <span className="absolute top-0 -right-1 bg-on-secondary text-secondary text-[10px] w-4 h-4 flex items-center justify-center rounded-full border border-secondary font-bold">
-          2
-        </span>
+        {isLoaded && cartCount > 0 && (
+          <span className="absolute top-0 -right-1 bg-on-secondary text-secondary text-[10px] w-4 h-4 flex items-center justify-center rounded-full border border-secondary font-bold">
+            {cartCount}
+          </span>
+        )}
       </Link>
 
       <Link
@@ -108,12 +98,7 @@ export default function BottomNav() {
             referrerPolicy="no-referrer"
           />
         ) : (
-          <span
-            className="material-symbols-outlined"
-            style={{ fontVariationSettings: activeTab === 'perfil' ? '"FILL" 1' : undefined }}
-          >
-            person
-          </span>
+          <UserIcon className="w-6 h-6" fill={activeTab === 'perfil' ? 'currentColor' : 'none'} />
         )}
         <span className="font-label-md text-label-md mt-1">Mi Perfil</span>
       </Link>

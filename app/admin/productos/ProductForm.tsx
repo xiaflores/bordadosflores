@@ -4,6 +4,18 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { supabase } from '../../lib/supabase';
+import { 
+  Info, 
+  ChevronDown, 
+  Coins, 
+  Sliders, 
+  Images, 
+  Plus, 
+  Image as ImageIcon, 
+  X, 
+  FileText, 
+  Save 
+} from 'lucide-react';
 
 interface ProductFormProps {
   productId?: string;
@@ -104,10 +116,7 @@ export default function ProductForm({ productId }: ProductFormProps) {
       return;
     }
 
-    const slugId = isEditMode ? id : (id.trim() || `prod_${Math.random().toString(36).substring(2, 9)}`);
-
     const productPayload = {
-      id: slugId,
       name,
       category,
       price,
@@ -184,21 +193,19 @@ export default function ProductForm({ productId }: ProductFormProps) {
           {/* Section 1: Product Info */}
           <section className="space-y-6">
             <div className="flex items-center gap-2 border-b border-outline-variant/20 pb-2">
-              <span className="material-symbols-outlined text-primary text-xl">info</span>
+              <Info className="w-5 h-5 text-primary" />
               <h3 className="font-bold text-sm uppercase tracking-widest text-on-surface-variant">Información del Producto</h3>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* SKU / ID */}
+              {/* ID del Producto */}
               <div className="flex flex-col gap-2">
-                <label className="text-sm font-semibold text-on-surface">SKU / Identificador Único</label>
+                <label className="text-sm font-semibold text-on-surface">ID del Producto (UUID)</label>
                 <input
-                  className="w-full h-11 px-4 rounded-xl bg-surface-container-lowest border border-outline-variant/50 focus:border-primary focus:ring-4 focus:ring-primary/5 transition-all text-sm disabled:opacity-60"
-                  placeholder="ej. BF-JKT-001 (Automático si se deja vacío)"
+                  className="w-full h-11 px-4 rounded-xl bg-surface-container-low border border-outline-variant/30 text-on-surface-variant text-sm"
+                  value={isEditMode ? id : 'Generado automáticamente (UUID)'}
                   type="text"
-                  value={id}
-                  onChange={(e) => setId(e.target.value)}
-                  disabled={isEditMode}
+                  disabled
                 />
               </div>
 
@@ -220,7 +227,7 @@ export default function ProductForm({ productId }: ProductFormProps) {
                 <label className="text-sm font-semibold text-on-surface">Categoría <span className="text-primary">*</span></label>
                 <div className="relative">
                   <select
-                    className="w-full h-11 px-4 rounded-xl bg-surface-container-lowest border border-outline-variant/50 focus:border-primary focus:ring-4 focus:ring-primary/5 appearance-none transition-all text-sm"
+                    className="w-full h-11 px-4 rounded-xl bg-surface-container-lowest border border-outline-variant/50 focus:border-primary focus:ring-4 focus:ring-primary/5 appearance-none transition-all text-sm text-on-surface"
                     value={category}
                     onChange={(e) => setCategory(e.target.value)}
                   >
@@ -229,9 +236,7 @@ export default function ProductForm({ productId }: ProductFormProps) {
                     <option value="Accesorios">Accesorios</option>
                     <option value="Textiles">Textiles</option>
                   </select>
-                  <span className="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant">
-                    expand_more
-                  </span>
+                  <ChevronDown className="w-5 h-5 absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant" />
                 </div>
               </div>
             </div>
@@ -240,7 +245,7 @@ export default function ProductForm({ productId }: ProductFormProps) {
           {/* Section 2: Price and Stock */}
           <section className="space-y-6">
             <div className="flex items-center gap-2 border-b border-outline-variant/20 pb-2">
-              <span className="material-symbols-outlined text-primary text-xl">payments</span>
+              <Coins className="w-5 h-5 text-primary" />
               <h3 className="font-bold text-sm uppercase tracking-widest text-on-surface-variant">Precio y Disponibilidad</h3>
             </div>
             
@@ -291,7 +296,7 @@ export default function ProductForm({ productId }: ProductFormProps) {
           {/* Section 3: Spec Attributes based on Category */}
           <section className="space-y-6">
             <div className="flex items-center gap-2 border-b border-outline-variant/20 pb-2">
-              <span className="material-symbols-outlined text-primary text-xl">tune</span>
+              <Sliders className="w-5 h-5 text-primary" />
               <h3 className="font-bold text-sm uppercase tracking-widest text-on-surface-variant">Atributos de Especificación</h3>
             </div>
 
@@ -408,18 +413,16 @@ export default function ProductForm({ productId }: ProductFormProps) {
                     <label className="text-sm font-semibold text-on-surface">Paños y Volumen</label>
                     <div className="relative">
                       <select
-                        className="w-full h-11 px-4 rounded-xl bg-surface-container-lowest border border-outline-variant/50 focus:border-primary appearance-none text-sm"
-                        value={panos}
-                        onChange={(e) => setPanos(e.target.value ? Number(e.target.value) : '')}
+                        className="w-full h-11 px-4 rounded-xl bg-surface-container-lowest border border-outline-variant/50 focus:border-primary focus:ring-4 focus:ring-primary/5 appearance-none transition-all text-sm text-on-surface"
+                        value={panos || ''}
+                        onChange={(e) => setPanos(Number(e.target.value))}
                       >
                         <option value="">Seleccionar pliegues</option>
                         <option value="6">6 Paños</option>
                         <option value="8">8 Paños</option>
                         <option value="10">10 Paños</option>
                       </select>
-                      <span className="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant">
-                        expand_more
-                      </span>
+                      <ChevronDown className="w-5 h-5 absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant" />
                     </div>
                   </div>
                 </>
@@ -462,7 +465,7 @@ export default function ProductForm({ productId }: ProductFormProps) {
           <section className="space-y-6">
             <div className="flex items-center justify-between border-b border-outline-variant/20 pb-2">
               <div className="flex items-center gap-2">
-                <span className="material-symbols-outlined text-primary text-xl">imagesmode</span>
+                <Images className="w-5 h-5 text-primary" />
                 <h3 className="font-bold text-sm uppercase tracking-widest text-on-surface-variant">Multimedia</h3>
               </div>
               <span className="text-[10px] font-bold text-primary uppercase bg-primary/5 px-2 py-0.5 rounded">
@@ -502,9 +505,9 @@ export default function ProductForm({ productId }: ProductFormProps) {
                       type="button"
                       onClick={handleAddImage}
                       disabled={images.length >= 4}
-                      className="w-full py-2.5 bg-primary/10 text-primary border border-primary/20 rounded-xl text-xs font-bold hover:bg-primary/15 transition-all flex items-center justify-center gap-1 cursor-pointer disabled:opacity-50"
+                      className="w-full py-2.5 bg-primary/10 text-primary border border-primary/20 rounded-xl text-xs font-bold hover:bg-primary/15 transition-all flex items-center justify-center gap-1 cursor-pointer disabled:opacity-50 font-semibold"
                     >
-                      <span className="material-symbols-outlined text-sm">add</span>
+                      <Plus className="w-4 h-4" />
                       Añadir a Galería
                     </button>
                   </div>
@@ -520,7 +523,7 @@ export default function ProductForm({ productId }: ProductFormProps) {
                         <img src={imageUrl} alt="Principal" className="w-full h-full object-cover" />
                       ) : (
                         <div className="w-full h-full flex flex-col items-center justify-center text-outline-variant">
-                          <span className="material-symbols-outlined text-2xl">image</span>
+                          <ImageIcon className="w-6 h-6" />
                           <span className="text-[10px] font-bold mt-1">Sin Imagen</span>
                         </div>
                       )}
@@ -540,12 +543,12 @@ export default function ProductForm({ productId }: ProductFormProps) {
                             onClick={() => handleRemoveImage(index)}
                             className="absolute top-2 right-2 bg-black/60 backdrop-blur-md rounded-full p-1 shadow-lg hover:bg-error transition-colors cursor-pointer text-white flex items-center justify-center"
                           >
-                            <span className="material-symbols-outlined text-[14px]">close</span>
+                            <X className="w-3.5 h-3.5" />
                           </button>
                         </div>
                       ) : (
                         <div key={index} className="aspect-square rounded-xl bg-surface-container-low flex flex-col items-center justify-center border border-outline-variant/20 border-dashed text-outline-variant/60">
-                          <span className="material-symbols-outlined text-xl">image</span>
+                          <ImageIcon className="w-5 h-5" />
                           <span className="text-[9px] mt-1">Vacío</span>
                         </div>
                       );
@@ -561,7 +564,7 @@ export default function ProductForm({ productId }: ProductFormProps) {
           {/* Section 5: Description */}
           <section className="space-y-6">
             <div className="flex items-center gap-2 border-b border-outline-variant/20 pb-2">
-              <span className="material-symbols-outlined text-primary text-xl">description</span>
+              <FileText className="w-5 h-5 text-primary" />
               <h3 className="font-bold text-sm uppercase tracking-widest text-on-surface-variant">Descripción del Catálogo</h3>
             </div>
             <div className="flex flex-col gap-2">
@@ -594,7 +597,7 @@ export default function ProductForm({ productId }: ProductFormProps) {
               <div className="w-5 h-5 border-2 border-on-primary border-t-transparent rounded-full animate-spin"></div>
             ) : (
               <>
-                <span className="material-symbols-outlined text-xl">save</span>
+                <Save className="w-4 h-4 text-white" />
                 {isEditMode ? 'Guardar Cambios' : 'Guardar Producto'}
               </>
             )}

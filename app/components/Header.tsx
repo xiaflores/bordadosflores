@@ -5,11 +5,14 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { supabase } from '../lib/supabase';
 import { User } from '@supabase/supabase-js';
+import { useCart } from '../context/CartContext';
+import { Search, ShoppingBag } from 'lucide-react';
 
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const pathname = usePathname();
   const [user, setUser] = useState<User | null>(null);
+  const { cartCount, isLoaded } = useCart();
 
   useEffect(() => {
     // Get initial session
@@ -111,19 +114,20 @@ export default function Header() {
           </nav>
 
           <div className="flex items-center gap-1 md:gap-2">
-            <button className="p-2 rounded-full active:scale-95 text-primary hover:bg-surface-container transition-all">
-              <span className="material-symbols-outlined flex items-center justify-center">
-                search
-              </span>
+            <button className="p-2 rounded-full active:scale-95 text-primary hover:bg-surface-container transition-all flex items-center justify-center">
+              <Search className="w-5 h-5" />
             </button>
-            <button className="p-2 rounded-full relative active:scale-95 text-primary hover:bg-surface-container transition-all">
-              <span className="material-symbols-outlined flex items-center justify-center">
-                shopping_basket
-              </span>
-              <span className="absolute top-1 right-1 text-white text-[10px] w-4 h-4 flex items-center justify-center rounded-full border border-white bg-primary font-bold">
-                2
-              </span>
-            </button>
+            <Link
+              href="/cesta"
+              className="p-2 rounded-full relative active:scale-95 text-primary hover:bg-surface-container transition-all flex items-center justify-center"
+            >
+              <ShoppingBag className="w-5 h-5" />
+              {isLoaded && cartCount > 0 && (
+                <span className="absolute top-1 right-1 text-white text-[10px] w-4 h-4 flex items-center justify-center rounded-full border border-white bg-primary font-bold">
+                  {cartCount}
+                </span>
+              )}
+            </Link>
           </div>
         </div>
       </div>

@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { supabase } from '../lib/supabase';
 import { User } from '@supabase/supabase-js';
+import { ArrowLeft, Sparkles } from 'lucide-react';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -236,10 +237,9 @@ export default function LoginPage() {
         <main className="flex-grow flex items-center justify-center pb-12 px-margin-mobile py-12">
           <div className="max-w-md w-full bg-white p-8 rounded-xl soft-elevation border border-surface-variant/30 text-center">
             
-            {/* Back Home Button */}
             <div className="text-left mb-6">
               <Link href="/" className="inline-flex items-center gap-2 text-primary hover:opacity-80 font-bold transition-all text-body-sm">
-                <span className="material-symbols-outlined text-lg">arrow_back</span>
+                <ArrowLeft className="w-4 h-4" />
                 Volver al inicio
               </Link>
             </div>
@@ -315,7 +315,7 @@ export default function LoginPage() {
           {/* Back Home Link */}
           <div className="mb-4">
             <Link href="/" className="inline-flex items-center gap-1 text-primary hover:opacity-80 font-bold transition-all text-body-sm">
-              <span className="material-symbols-outlined text-lg">arrow_back</span>
+              <ArrowLeft className="w-4 h-4" />
               Volver al inicio
             </Link>
           </div>
@@ -494,9 +494,7 @@ export default function LoginPage() {
           style={{ backgroundImage: `url('https://lh3.googleusercontent.com/aida-public/AB6AXuDD4pxKnFrBc57S3uRMWZU7s-swT6dOSteXLb9LRzTKjpOn30o1lMH-Y8FirFvVyDBWFCXVFYYhw71b0JVdt5D_m4q_a1HgkZG7W6z_mTzuGUEBdGhlbmY9IyikVACjoIhDU5pQrKh8-zGDLW0DhhVIex0s_hs_MPOFEK4hzGoLuPIWncWdDI2qpTn_3rtzlx4Deg3enn5uvyBiTYtLMXWD6Ytl0Ir3UP57kZl4oZ7A4wE0mPLFxoRdSmsfQnZXqY2bsOMqhqzLsQ')` }}
         ></div>
         <div className="h-full flex flex-col items-center justify-center text-on-primary p-12 text-center relative z-10">
-          <span className="material-symbols-outlined text-6xl mb-6 font-fill" style={{ fontVariationSettings: "'FILL' 1" }}>
-            auto_awesome
-          </span>
+          <Sparkles className="w-12 h-12 mb-6 text-white" />
           <h2 className="font-headline-xl text-headline-xl mb-4 leading-tight">Un Legado en Cada Hilo</h2>
           <p className="font-body-lg text-body-lg text-on-primary/80 leading-relaxed">
             Apoya a los artesanos locales y posee una pieza de la historia boliviana. Cada puntada cuenta una historia de generaciones.

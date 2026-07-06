@@ -5,6 +5,7 @@ import ProductCard from '../components/ProductCard';
 import { Product } from '../data/products';
 import { supabase } from '../lib/supabase';
 import SearchInput from './SearchInput';
+import { Info } from 'lucide-react';
 
 type FilterType = 'Todos' | 'Novedades' | 'Chaquetas' | 'Polleras' | 'Accesorios';
 
@@ -157,10 +158,8 @@ export default async function CatalogoPage({ searchParams }: CatalogoProps) {
 
         {/* Empty Search / Filter State */}
         {totalItems === 0 && (
-          <div className="text-center py-16 text-on-surface-variant">
-            <span className="material-symbols-outlined text-4xl block mb-2 text-outline">
-              info
-            </span>
+          <div className="text-center py-16 text-on-surface-variant flex flex-col items-center justify-center">
+            <Info className="w-10 h-10 mb-2 text-outline" />
             <p className="font-body-lg text-body-lg">
               No se encontraron productos que coincidan con la búsqueda o filtro seleccionado.
             </p>

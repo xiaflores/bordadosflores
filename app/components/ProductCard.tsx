@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { Product } from '../data/products';
+import { Heart } from 'lucide-react';
 
 interface ProductCardProps {
   product: Product;
@@ -13,7 +14,7 @@ export default function ProductCard({ product }: ProductCardProps) {
 
   return (
     <article className="bg-surface-container-lowest rounded-xl overflow-hidden shadow-[0px_4px_20px_rgba(0,0,0,0.04)] hover:shadow-lg transition-all duration-300 group relative flex flex-col justify-between">
-      <Link href={`/productos/${product.id}`} className="block flex-1 flex flex-col justify-between cursor-pointer">
+      <Link href={`/productos/${product.slug || product.id}`} className="block flex-1 flex flex-col justify-between cursor-pointer">
         <div>
           {/* Product Image Container */}
           <div className="relative aspect-[3/4] overflow-hidden bg-surface-container-low">
@@ -35,12 +36,7 @@ export default function ProductCard({ product }: ProductCardProps) {
               }`}
               aria-label="Agregar a favoritos"
             >
-              <span
-                className="material-symbols-outlined text-[20px]"
-                style={{ fontVariationSettings: isFavorite ? '"FILL" 1' : '"FILL" 0' }}
-              >
-                favorite
-              </span>
+              <Heart className="w-5 h-5" fill={isFavorite ? 'currentColor' : 'none'} />
             </button>
 
             {/* Availability Badge (Top-Right) */}

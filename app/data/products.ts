@@ -16,6 +16,7 @@ export interface Product {
   cintura?: number;
   panos?: number;
   talla?: string;
+  slug?: string;
 }
 
 export const mockProducts: Product[] = [
