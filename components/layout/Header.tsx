@@ -13,6 +13,32 @@ export default function Header() {
   const pathname = usePathname();
   const [user, setUser] = useState<User | null>(null);
   const { cartCount, isLoaded } = useCart();
+  const [profile, setProfile] = useState<{ full_name: string; avatar_url: string } | null>(null);
+
+  useEffect(() => {
+    if (user) {
+      const getProfile = async () => {
+        try {
+          const { data } = await supabase
+            .from('profiles')
+            .select('full_name, avatar_url')
+            .eq('id', user.id)
+            .maybeSingle();
+          if (data) {
+            setProfile({
+              full_name: data.full_name || '',
+              avatar_url: data.avatar_url || ''
+            });
+          }
+        } catch (err) {
+          console.error('Error loading header profile:', err);
+        }
+      };
+      getProfile();
+    } else {
+      setProfile(null);
+    }
+  }, [user]);
 
   useEffect(() => {
     // Get initial session
@@ -80,33 +106,25 @@ export default function Header() {
             >
               Catálogo
             </Link>
-            <Link
-              className={`font-bold text-label-md uppercase tracking-wider transition-colors ${
-                pathname.startsWith('/pedidos') ? 'text-primary' : 'text-on-surface hover:text-primary'
-              }`}
-              href="/pedidos"
-            >
-              Seguimiento
-            </Link>
             {user ? (
               <Link
                 href="/login"
                 className="flex items-center gap-2 hover:opacity-80 transition-all"
               >
-                {user.user_metadata?.avatar_url || user.user_metadata?.picture ? (
+                {profile?.avatar_url || user.user_metadata?.avatar_url || user.user_metadata?.picture ? (
                   <img
-                    src={user.user_metadata.avatar_url || user.user_metadata.picture}
-                    alt={user.user_metadata.full_name || 'Perfil'}
+                    src={profile?.avatar_url || user.user_metadata.avatar_url || user.user_metadata.picture}
+                    alt={profile?.full_name || user.user_metadata.full_name || 'Perfil'}
                     className="w-8 h-8 rounded-full border border-primary/20 object-cover shadow-sm"
                     referrerPolicy="no-referrer"
                   />
                 ) : (
                   <div className="w-8 h-8 rounded-full bg-primary text-on-primary flex items-center justify-center font-bold text-sm shadow-sm uppercase">
-                    {(user.user_metadata?.full_name || user.email || 'U').charAt(0)}
+                    {(profile?.full_name || user.user_metadata?.full_name || user.email || 'U').charAt(0)}
                   </div>
                 )}
                 <span className="hidden sm:inline font-bold text-label-md uppercase tracking-wider text-on-surface">
-                  {user.user_metadata?.full_name?.split(' ')[0] || user.email?.split('@')[0] || 'Mi Perfil'}
+                  {(profile?.full_name || user.user_metadata?.full_name || user.email)?.split(' ')[0] || 'Mi Perfil'}
                 </span>
               </Link>
             ) : (

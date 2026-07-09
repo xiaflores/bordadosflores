@@ -6,12 +6,35 @@ import { usePathname } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { User } from '@supabase/supabase-js';
 import { useCart } from '@/context/CartContext';
-import { Home, BookOpen, ShoppingCart, User as UserIcon, ClipboardList } from 'lucide-react';
+import { Home, BookOpen, ShoppingCart, User as UserIcon } from 'lucide-react';
 
 export default function BottomNav() {
   const pathname = usePathname();
   const [user, setUser] = useState<User | null>(null);
   const { cartCount, isLoaded } = useCart();
+  const [profile, setProfile] = useState<{ avatar_url: string } | null>(null);
+
+  useEffect(() => {
+    if (user) {
+      const getProfile = async () => {
+        try {
+          const { data } = await supabase
+            .from('profiles')
+            .select('avatar_url')
+            .eq('id', user.id)
+            .maybeSingle();
+          if (data) {
+            setProfile({ avatar_url: data.avatar_url || '' });
+          }
+        } catch (err) {
+          console.error('Error loading bottom nav profile:', err);
+        }
+      };
+      getProfile();
+    } else {
+      setProfile(null);
+    }
+  }, [user]);
 
   useEffect(() => {
     // Get initial session
@@ -32,7 +55,6 @@ export default function BottomNav() {
   const getActiveTab = () => {
     if (pathname === '/') return 'inicio';
     if (pathname.startsWith('/catalogo')) return 'catalogo';
-    if (pathname.startsWith('/pedidos')) return 'pedidos';
     if (pathname.startsWith('/cesta')) return 'cesta';
     if (pathname.startsWith('/login')) return 'perfil';
     return 'inicio';
@@ -67,18 +89,6 @@ export default function BottomNav() {
       </Link>
 
       <Link
-        href="/pedidos"
-        className={`flex flex-col items-center justify-center transition-all duration-300 ease-out active:scale-90 ${
-          activeTab === 'pedidos'
-            ? 'scale-110 text-on-secondary font-bold'
-            : 'text-on-secondary/70 hover:bg-on-secondary/10 rounded-lg p-1'
-        }`}
-      >
-        <ClipboardList className="w-6 h-6" fill={activeTab === 'pedidos' ? 'currentColor' : 'none'} />
-        <span className="font-label-md text-label-md mt-1">Pedidos</span>
-      </Link>
-
-      <Link
         href="/cesta"
         className={`flex flex-col items-center justify-center transition-all duration-300 ease-out active:scale-90 relative ${
           activeTab === 'cesta'
@@ -103,9 +113,9 @@ export default function BottomNav() {
             : 'text-on-secondary/70 hover:bg-on-secondary/10 rounded-lg p-1'
         }`}
       >
-        {user && (user.user_metadata?.avatar_url || user.user_metadata?.picture) ? (
+        {user && (profile?.avatar_url || user.user_metadata?.avatar_url || user.user_metadata?.picture) ? (
           <img
-            src={user.user_metadata.avatar_url || user.user_metadata.picture}
+            src={profile?.avatar_url || user.user_metadata.avatar_url || user.user_metadata.picture}
             alt="Perfil"
             className="w-6 h-6 rounded-full border border-on-secondary/20 object-cover"
             referrerPolicy="no-referrer"
