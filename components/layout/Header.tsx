@@ -80,6 +80,14 @@ export default function Header() {
             >
               Catálogo
             </Link>
+            <Link
+              className={`font-bold text-label-md uppercase tracking-wider transition-colors ${
+                pathname.startsWith('/pedidos') ? 'text-primary' : 'text-on-surface hover:text-primary'
+              }`}
+              href="/pedidos"
+            >
+              Seguimiento
+            </Link>
             {user ? (
               <Link
                 href="/login"

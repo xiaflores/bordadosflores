@@ -31,7 +31,7 @@ export default function HeroSlider() {
   };
 
   return (
-    <section className="relative overflow-hidden rounded-3xl bg-secondary-container text-on-secondary-container h-[240px] shadow-lg group">
+    <section className="relative overflow-hidden rounded-3xl bg-secondary-container text-on-secondary-container h-[260px] sm:h-[340px] md:h-[400px] lg:h-[460px] shadow-lg group">
       <div className="relative h-full w-full overflow-hidden">
         {/* Slides Container */}
         <div
@@ -49,18 +49,18 @@ export default function HeroSlider() {
                 src={slide.imageUrl}
               />
               <div className="absolute inset-0 bg-black/40"></div>
-              <div className="relative z-10 p-6 flex flex-col justify-center h-full max-w-[80%]">
+              <div className="relative z-10 p-6 sm:p-12 lg:p-16 flex flex-col justify-center h-full max-w-[90%] sm:max-w-[80%] md:max-w-[70%]">
                 {slide.tag && (
                   <span className="bg-primary/20 backdrop-blur-sm text-white px-3 py-1 rounded-full text-label-md font-label-md inline-block mb-3 self-start">
                     {slide.tag}
                   </span>
                 )}
-                <h2 className="font-headline-lg-mobile text-headline-lg-mobile text-white mb-4">
+                <h2 className="font-headline-lg text-headline-lg md:text-headline-xl text-white mb-4 lg:mb-6 max-w-2xl leading-tight">
                   {slide.title}
                 </h2>
                 <a
                   href={slide.link}
-                  className="bg-primary hover:bg-primary-container text-on-primary px-6 py-3 rounded-full font-headline-sm text-headline-sm transition-all shadow-md self-start h-12 flex items-center justify-center cursor-pointer active:scale-95"
+                  className="bg-primary hover:bg-primary-container text-on-primary px-6 py-3 md:px-8 md:py-4 rounded-full font-headline-sm text-headline-sm transition-all shadow-md self-start h-12 md:h-14 flex items-center justify-center cursor-pointer active:scale-95"
                 >
                   {slide.buttonText}
                 </a>

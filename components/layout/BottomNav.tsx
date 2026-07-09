@@ -6,7 +6,7 @@ import { usePathname } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { User } from '@supabase/supabase-js';
 import { useCart } from '@/context/CartContext';
-import { Home, BookOpen, ShoppingCart, User as UserIcon } from 'lucide-react';
+import { Home, BookOpen, ShoppingCart, User as UserIcon, ClipboardList } from 'lucide-react';
 
 export default function BottomNav() {
   const pathname = usePathname();
@@ -32,6 +32,7 @@ export default function BottomNav() {
   const getActiveTab = () => {
     if (pathname === '/') return 'inicio';
     if (pathname.startsWith('/catalogo')) return 'catalogo';
+    if (pathname.startsWith('/pedidos')) return 'pedidos';
     if (pathname.startsWith('/cesta')) return 'cesta';
     if (pathname.startsWith('/login')) return 'perfil';
     return 'inicio';
@@ -63,6 +64,18 @@ export default function BottomNav() {
       >
         <BookOpen className="w-6 h-6" fill={activeTab === 'catalogo' ? 'currentColor' : 'none'} />
         <span className="font-label-md text-label-md mt-1">Catálogo</span>
+      </Link>
+
+      <Link
+        href="/pedidos"
+        className={`flex flex-col items-center justify-center transition-all duration-300 ease-out active:scale-90 ${
+          activeTab === 'pedidos'
+            ? 'scale-110 text-on-secondary font-bold'
+            : 'text-on-secondary/70 hover:bg-on-secondary/10 rounded-lg p-1'
+        }`}
+      >
+        <ClipboardList className="w-6 h-6" fill={activeTab === 'pedidos' ? 'currentColor' : 'none'} />
+        <span className="font-label-md text-label-md mt-1">Pedidos</span>
       </Link>
 
       <Link

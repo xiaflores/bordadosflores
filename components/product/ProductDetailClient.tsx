@@ -321,11 +321,11 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
             <span className="text-secondary font-label-md text-label-md tracking-[0.25em] uppercase font-bold">
               {product.category}
             </span>
-            <h1 className="font-headline-lg text-headline-lg-mobile lg:text-headline-xl text-on-background leading-tight">
+            <h1 className="font-headline-lg text-headline-md lg:text-headline-lg text-on-background leading-tight">
               {product.name}
             </h1>
             <div className="flex items-center gap-3 mt-1">
-              <p className="font-headline-md text-secondary font-bold text-2xl">
+              <p className="font-headline-md text-secondary font-bold text-xl lg:text-2xl">
                 {formatCurrency(currentPrice)}
               </p>
               {product.originalPrice && (

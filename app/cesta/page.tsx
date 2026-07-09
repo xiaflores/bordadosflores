@@ -7,6 +7,7 @@ import BottomNav from '@/components/layout/BottomNav';
 import { useCart } from '@/context/CartContext';
 import CartItemRow from '@/components/cart/CartItemRow';
 import { DEPARTAMENTOS } from '@/lib/constants';
+import { supabase } from '@/lib/supabase';
 import { formatCurrency } from '@/lib/utils';
 import { 
   Loader2, 
@@ -21,7 +22,7 @@ import {
 } from 'lucide-react';
 
 export default function CestaPage() {
-  const { cartItems, removeFromCart, updateQuantity, cartSubtotal, cartCount, isLoaded } = useCart();
+  const { cartItems, removeFromCart, updateQuantity, cartSubtotal, cartCount, isLoaded, clearCart } = useCart();
   const [selectedDeptId, setSelectedDeptId] = useState('or');
   const [customLocation, setCustomLocation] = useState('');
 
@@ -41,8 +42,62 @@ export default function CestaPage() {
   const selectedDept = DEPARTAMENTOS.find(d => d.id === selectedDeptId) || DEPARTAMENTOS[0];
   const total = cartSubtotal + selectedDept.costo;
 
-  const handleCheckout = () => {
-    let text = `🇧🇴 *NUEVO PEDIDO - BORDADOS FLORES* 🇧🇴\n\n`;
+  const handleCheckout = async () => {
+    // 1. Get current authenticated user
+    const { data: { user } } = await supabase.auth.getUser();
+    const userId = user?.id || null;
+    const customerName = user?.user_metadata?.full_name || user?.email || 'Cliente Web';
+    const customerPhone = user?.phone || '';
+
+    // 2. Insert order details in Supabase
+    let orderId = '';
+    try {
+      const { data: insertedOrder, error } = await supabase
+        .from('pedidos')
+        .insert([{
+          customer_name: customerName,
+          customer_phone: customerPhone,
+          shipping_destination: selectedDeptId,
+          custom_location: selectedDeptId === 'otro' ? customLocation : null,
+          subtotal: cartSubtotal,
+          shipping_cost: selectedDept.costo,
+          total: total,
+          monto_adelanto: 0,
+          saldo_pendiente: total,
+          items: cartItems.map(item => ({
+            id: item.id,
+            name: item.name,
+            category: item.category,
+            price: item.price,
+            imageUrl: item.imageUrl,
+            quantity: item.quantity,
+            colorName: item.colorName,
+            colorHex: item.colorHex,
+            panos: item.panos,
+            largo: item.largo,
+            cintura: item.cintura,
+            talla: item.talla,
+            fechaEntrega: item.fechaEntrega,
+            slug: item.slug
+          })),
+          user_id: userId
+        }])
+        .select()
+        .single();
+
+      if (error) throw error;
+      if (insertedOrder) {
+        orderId = insertedOrder.id;
+      }
+    } catch (err) {
+      console.error('Error saving order in database:', err);
+    }
+
+    let text = `🇧🇴 *NUEVO PEDIDO - BORDADOS FLORES* 🇧🇴\n`;
+    if (orderId) {
+      text += `*Referencia:* #${orderId.substring(0, 8)}\n`;
+    }
+    text += `\n`;
     text += `Hola Bordados Flores, me gustaría coordinar la compra de los siguientes artículos de mi cesta:\n\n`;
 
     const formatRow = (label: string, value: string) => {
@@ -93,6 +148,10 @@ export default function CestaPage() {
     text += `Por favor, confírmenme los datos para realizar el pago (transferencia o QR) y coordinar el envío. ¡Muchas gracias!`;
 
     const encodedMessage = encodeURIComponent(text);
+    
+    // Clear the cart on successful checkout
+    clearCart();
+    
     window.open(`https://wa.me/59171182580?text=${encodedMessage}`, '_blank');
   };
 

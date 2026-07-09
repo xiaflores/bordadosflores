@@ -4,9 +4,114 @@
 
 :root {
   color-scheme: light;
+
+  /* Responsive Typography Configuration */
+  /* Default Mobile sizes */
+  --text-headline-xl-val: 26px;
+  --text-headline-xl-lh: 32px;
+
+  --text-headline-lg-val: 22px;
+  --text-headline-lg-lh: 28px;
+
+  --text-headline-md-val: 18px;
+  --text-headline-md-lh: 24px;
+
+  --text-headline-sm-val: 16px;
+  --text-headline-sm-lh: 22px;
+
+  --text-body-lg-val: 15px;
+  --text-body-lg-lh: 22px;
+
+  --text-body-md-val: 14px;
+  --text-body-md-lh: 20px;
+
+  --text-body-sm-val: 12px;
+  --text-body-sm-lh: 18px;
+
+  --text-label-md-val: 11px;
+  --text-label-md-lh: 14px;
 }
 
+@media (min-width: 640px) {
+  :root {
+    /* Small Tablet sizes */
+    --text-headline-xl-val: 30px;
+    --text-headline-xl-lh: 36px;
 
+    --text-headline-lg-val: 25px;
+    --text-headline-lg-lh: 32px;
+
+    --text-headline-md-val: 20px;
+    --text-headline-md-lh: 26px;
+
+    --text-headline-sm-val: 18px;
+    --text-headline-sm-lh: 24px;
+
+    --text-body-lg-val: 16px;
+    --text-body-lg-lh: 24px;
+
+    --text-body-md-val: 14.5px;
+    --text-body-md-lh: 21px;
+  }
+}
+
+@media (min-width: 768px) {
+  :root {
+    /* Medium Tablet sizes */
+    --text-headline-xl-val: 34px;
+    --text-headline-xl-lh: 40px;
+
+    --text-headline-lg-val: 28px;
+    --text-headline-lg-lh: 36px;
+
+    --text-headline-md-val: 22px;
+    --text-headline-md-lh: 28px;
+
+    --text-headline-sm-val: 19px;
+    --text-headline-sm-lh: 26px;
+
+    --text-body-lg-val: 17px;
+    --text-body-lg-lh: 26px;
+
+    --text-body-md-val: 15px;
+    --text-body-md-lh: 22px;
+
+    --text-body-sm-val: 13px;
+    --text-body-sm-lh: 19px;
+
+    --text-label-md-val: 11.5px;
+    --text-label-md-lh: 15px;
+  }
+}
+
+@media (min-width: 1024px) {
+  :root {
+    /* Desktop sizes */
+    --text-headline-xl-val: 40px;
+    --text-headline-xl-lh: 48px;
+
+    --text-headline-lg-val: 32px;
+    --text-headline-lg-lh: 40px;
+
+    --text-headline-md-val: 24px;
+    --text-headline-md-lh: 32px;
+
+    --text-headline-sm-val: 20px;
+    --text-headline-sm-lh: 28px;
+
+    --text-body-lg-val: 18px;
+    --text-body-lg-lh: 28px;
+
+    --text-body-md-val: 16px;
+    --text-body-md-lh: 24px;
+
+    --text-body-sm-val: 14px;
+    --text-body-sm-lh: 20px;
+
+    --text-label-md-val: 12px;
+    --text-label-md-lh: 16px;
+  }
+}
 
 @theme {
   --color-on-primary: #ffffff;
@@ -79,44 +184,44 @@
   --font-headline-md: 'Manrope', sans-serif;
   --font-body-md: 'Be Vietnam Pro', sans-serif;
 
-  --text-headline-lg-mobile: 28px;
-  --text-headline-lg-mobile--line-height: 34px;
-  --text-headline-lg-mobile--font-weight: 700;
-
-  --text-headline-xl: 40px;
-  --text-headline-xl--line-height: 48px;
+  --text-headline-xl: var(--text-headline-xl-val);
+  --text-headline-xl--line-height: var(--text-headline-xl-lh);
   --text-headline-xl--letter-spacing: -0.02em;
   --text-headline-xl--font-weight: 700;
 
-  --text-headline-lg: 32px;
-  --text-headline-lg--line-height: 40px;
+  --text-headline-lg: var(--text-headline-lg-val);
+  --text-headline-lg--line-height: var(--text-headline-lg-lh);
   --text-headline-lg--letter-spacing: -0.01em;
   --text-headline-lg--font-weight: 700;
 
-  --text-body-sm: 14px;
-  --text-body-sm--line-height: 20px;
-  --text-body-sm--font-weight: 400;
+  --text-headline-lg-mobile: var(--text-headline-lg-val);
+  --text-headline-lg-mobile--line-height: var(--text-headline-lg-lh);
+  --text-headline-lg-mobile--font-weight: 700;
 
-  --text-label-md: 12px;
-  --text-label-md--line-height: 16px;
-  --text-label-md--letter-spacing: 0.05em;
-  --text-label-md--font-weight: 600;
-
-  --text-headline-sm: 20px;
-  --text-headline-sm--line-height: 28px;
-  --text-headline-sm--font-weight: 600;
-
-  --text-body-lg: 18px;
-  --text-body-lg--line-height: 28px;
-  --text-body-lg--font-weight: 400;
-
-  --text-headline-md: 24px;
-  --text-headline-md--line-height: 32px;
+  --text-headline-md: var(--text-headline-md-val);
+  --text-headline-md--line-height: var(--text-headline-md-lh);
   --text-headline-md--font-weight: 600;
 
-  --text-body-md: 16px;
-  --text-body-md--line-height: 24px;
+  --text-headline-sm: var(--text-headline-sm-val);
+  --text-headline-sm--line-height: var(--text-headline-sm-lh);
+  --text-headline-sm--font-weight: 600;
+
+  --text-body-lg: var(--text-body-lg-val);
+  --text-body-lg--line-height: var(--text-body-lg-lh);
+  --text-body-lg--font-weight: 400;
+
+  --text-body-md: var(--text-body-md-val);
+  --text-body-md--line-height: var(--text-body-md-lh);
   --text-body-md--font-weight: 400;
+
+  --text-body-sm: var(--text-body-sm-val);
+  --text-body-sm--line-height: var(--text-body-sm-lh);
+  --text-body-sm--font-weight: 400;
+
+  --text-label-md: var(--text-label-md-val);
+  --text-label-md--line-height: var(--text-label-md-lh);
+  --text-label-md--letter-spacing: 0.05em;
+  --text-label-md--font-weight: 600;
 }
 
 .material-symbols-outlined {

@@ -183,10 +183,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           </Link>
 
           <Link
-            href="#"
-            className="flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-primary transition-all"
+            href="/admin/pedidos"
+            className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
+              pathname.startsWith('/admin/pedidos')
+                ? 'text-primary font-bold border-r-4 border-primary bg-surface-container-high'
+                : 'text-on-surface-variant hover:bg-surface-container-high hover:text-primary'
+            }`}
           >
-            <ShoppingCart className="w-5 h-5 shrink-0" />
+            <ShoppingCart className="w-5 h-5 shrink-0" fill={pathname.startsWith('/admin/pedidos') ? 'currentColor' : 'none'} />
             {!sidebarCollapsed && <span className="font-beVietnamPro text-body-md">Pedidos</span>}
           </Link>
 
