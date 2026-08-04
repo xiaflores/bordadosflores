@@ -70,6 +70,8 @@ export default function LoginPage() {
   const [uploadingFile, setUploadingFile] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [userProfile, setUserProfile] = useState<{ full_name: string; avatar_url: string } | null>(null);
+  const [avatarImgError, setAvatarImgError] = useState(false);
+  const [editAvatarImgError, setEditAvatarImgError] = useState(false);
 
   // Helper to ensure a profile record exists in public.profiles table
   const ensureProfileExists = async (currentUser: User) => {
@@ -100,7 +102,7 @@ export default function LoginPage() {
         .from('profiles')
         .select('full_name, avatar_url')
         .eq('id', userId)
-        .single();
+        .maybeSingle();
       if (error) throw error;
       if (data) {
         setUserProfile({
@@ -170,13 +172,15 @@ export default function LoginPage() {
   // Sync edit profile values and load orders when user session is updated
   useEffect(() => {
     if (user) {
-      setEditFullName(user.user_metadata?.full_name || user.user_metadata?.name || '');
-      setEditAvatarUrl(user.user_metadata?.avatar_url || user.user_metadata?.picture || '');
+      setEditFullName(userProfile?.full_name || user.user_metadata?.full_name || user.user_metadata?.name || '');
+      setEditAvatarUrl(userProfile?.avatar_url || user.user_metadata?.avatar_url || user.user_metadata?.picture || '');
+      setAvatarImgError(false);
+      setEditAvatarImgError(false);
       fetchUserOrders(user.id);
     } else {
       setUserOrders([]);
     }
-  }, [user]);
+  }, [user, userProfile]);
 
   // Set mounted on client load
   useEffect(() => {
@@ -437,7 +441,10 @@ export default function LoginPage() {
 
   // Render Logged In Profile State
   if (user) {
-    const userAvatar = userProfile?.avatar_url || user.user_metadata?.avatar_url || user.user_metadata?.picture;
+    const rawAvatar = (userProfile?.avatar_url && userProfile.avatar_url.trim() !== '')
+      ? userProfile.avatar_url
+      : (user.user_metadata?.avatar_url || user.user_metadata?.picture || '');
+    const userAvatar = avatarImgError ? '' : rawAvatar;
     const displayName = userProfile?.full_name || user.user_metadata?.full_name || user.user_metadata?.name || user.email?.split('@')[0] || 'Artesano';
     const provider = user.app_metadata?.provider || 'correo electrónico';
 
@@ -570,247 +577,251 @@ export default function LoginPage() {
             )}
 
             {/* TAB VIEWS */}
-
-            {/* 1. Account Details Tab */}
-            {profileActiveTab === 'menu' && (
-              <div className="space-y-6 animate-fade-in">
-                <div className="flex flex-col items-center gap-4">
-                  <div className="relative">
-                    {userAvatar ? (
-                      <img
-                        src={userAvatar}
-                        alt={displayName}
-                        className="w-24 h-24 rounded-full border-4 border-primary/20 object-cover shadow-md"
-                        referrerPolicy="no-referrer"
-                      />
-                    ) : (
-                      <div className="w-24 h-24 rounded-full bg-primary text-on-primary flex items-center justify-center font-bold text-4xl shadow-md uppercase">
-                        {displayName.charAt(0)}
-                      </div>
-                    )}
-                    {/* Floating Edit Pencil Button */}
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setEditFullName(displayName);
-                        setEditAvatarUrl(userAvatar || '');
-                        setIsEditingProfile(true);
-                        setErrorMsg(null);
-                        setSuccessMsg(null);
-                      }}
-                      className="absolute bottom-0 right-0 p-2 bg-primary text-on-primary rounded-full hover:bg-primary-container transition-all active:scale-90 shadow-md cursor-pointer border-2 border-white flex items-center justify-center"
-                      title="Editar Perfil"
-                    >
-                      <Edit2 className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-                  
-                  <div>
-                    <h2 className="font-headline-md text-headline-md text-on-surface">{displayName}</h2>
-                    <p className="text-on-surface-variant text-body-md">{user.email}</p>
-                    <span className="inline-block mt-2 px-3 py-1 rounded-full text-xs font-semibold bg-surface-container-high text-on-surface-variant capitalize">
-                      Conectado con {provider}
-                    </span>
-                  </div>
-                </div>
-
-                <div className="space-y-3 pt-2">
-                  <Link
-                    href="/catalogo"
-                    className="w-full h-12 bg-primary text-on-primary rounded-xl font-bold flex items-center justify-center gap-2 transition-all active:scale-[0.98] cursor-pointer hover:opacity-90 shadow-md text-sm"
-                  >
-                    <BookOpen className="w-4 h-4" />
-                    Explorar Catálogo
-                  </Link>
-
-                  <button
-                    type="button"
-                    onClick={handleSignOut}
-                    disabled={loading}
-                    className="w-full h-12 border-2 border-red-200 text-red-500 hover:bg-red-50 rounded-xl font-bold flex items-center justify-center gap-2 transition-all active:scale-[0.98] disabled:opacity-50 cursor-pointer text-sm"
-                  >
-                    <LogOut className="w-4 h-4" />
-                    {loading ? 'Cerrando sesión...' : 'Cerrar Sesión'}
-                  </button>
-                </div>
-              </div>
-            )}
-
-            {/* 2. User Orders Subpage */}
-            {profileActiveTab === 'pedidos' && (
-              <div className="space-y-5 text-left animate-fade-in">
-                {loadingOrders ? (
-                  <div className="py-8 flex flex-col items-center justify-center gap-2">
-                    <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
-                    <p className="text-xs text-on-surface-variant">Cargando tus pedidos...</p>
-                  </div>
-                ) : userOrders.length === 0 ? (
-                  <div className="text-center py-6 bg-surface rounded-2xl border border-outline-variant/20 p-4">
-                    <Package className="w-8 h-8 mx-auto text-outline mb-2" />
-                    <p className="text-xs text-on-surface-variant font-semibold">No tienes pedidos registrados con esta cuenta.</p>
-                  </div>
-                ) : (
-                  <div className="space-y-3 max-h-[320px] overflow-y-auto pr-1 no-scrollbar">
-                    {userOrders.map((ord) => {
-                      const isExpanded = expandedUserOrderId === ord.id;
-                      const statusInfo = orderStatusDetails[ord.status as keyof typeof orderStatusDetails];
-                      return (
-                        <div key={ord.id} className="border border-outline-variant/30 rounded-xl overflow-hidden bg-surface-container-lowest">
-                          <div 
-                            onClick={() => setExpandedUserOrderId(isExpanded ? null : ord.id)}
-                            className="p-3.5 flex justify-between items-center cursor-pointer hover:bg-surface/30 select-none"
-                          >
-                            <div>
-                              <span className="font-mono text-xs font-bold text-primary block">#{ord.id.substring(0, 8)}</span>
-                              <span className="text-[10px] text-on-surface-variant">
-                                {new Date(ord.created_at).toLocaleDateString('es-BO')}
-                              </span>
-                            </div>
-                            <div className="text-right flex items-center gap-2">
-                              <div className="mr-2">
-                                <span className="text-[10px] text-on-surface-variant block">{ord.items.length} prendas</span>
-                                <span className="text-xs font-bold text-on-surface">{formatCurrency(ord.total, true)}</span>
-                              </div>
-                              <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold border ${orderStatusColors[ord.status]}`}>
-                                {orderStatuses[ord.status]}
-                              </span>
-                            </div>
+            <div className="min-h-[480px] flex flex-col justify-between text-left">
+              <div>
+                {/* 1. Account Details Tab */}
+                {profileActiveTab === 'menu' && (
+                  <div className="space-y-6 animate-fade-in">
+                    <div className="flex flex-col items-center gap-4">
+                      <div className="relative">
+                        {userAvatar ? (
+                          <img
+                            src={userAvatar}
+                            alt={displayName}
+                            className="w-24 h-24 rounded-full border-4 border-primary/20 object-cover shadow-md"
+                            referrerPolicy="no-referrer"
+                            onError={() => setAvatarImgError(true)}
+                          />
+                        ) : (
+                          <div className="w-24 h-24 rounded-full bg-primary text-on-primary flex items-center justify-center font-bold text-4xl shadow-md uppercase">
+                            {displayName.charAt(0)}
                           </div>
+                        )}
+                        {/* Floating Edit Pencil Button */}
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setEditFullName(displayName);
+                            setEditAvatarUrl(userAvatar || '');
+                            setIsEditingProfile(true);
+                            setErrorMsg(null);
+                            setSuccessMsg(null);
+                          }}
+                          className="absolute bottom-0 right-0 p-2 bg-primary text-on-primary rounded-full hover:bg-primary-container transition-all active:scale-90 shadow-md cursor-pointer border-2 border-white flex items-center justify-center"
+                          title="Editar Perfil"
+                        >
+                          <Edit2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                      
+                      <div>
+                        <h2 className="font-headline-md text-headline-md text-on-surface">{displayName}</h2>
+                        <p className="text-on-surface-variant text-body-md">{user.email}</p>
+                        <span className="inline-block mt-2 px-3 py-1 rounded-full text-xs font-semibold bg-surface-container-high text-on-surface-variant capitalize">
+                          Conectado con {provider}
+                        </span>
+                      </div>
+                    </div>
 
-                          {isExpanded && (
-                            <div className="p-3.5 border-t border-outline-variant/10 bg-surface/20 space-y-3 text-xs">
-                              <div className="space-y-1">
-                                <span className="text-[9px] uppercase font-bold text-on-surface-variant block">Estado del Pedido</span>
-                                <p className="font-bold text-on-surface">{statusInfo?.label}</p>
-                                <p className="text-[10px] text-on-surface-variant leading-tight">{statusInfo?.description}</p>
-                              </div>
+                    <div className="space-y-3 pt-2">
+                      <Link
+                        href="/catalogo"
+                        className="w-full h-12 bg-primary text-on-primary rounded-xl font-bold flex items-center justify-center gap-2 transition-all active:scale-[0.98] cursor-pointer hover:opacity-90 shadow-md text-sm"
+                      >
+                        <BookOpen className="w-4 h-4" />
+                        Explorar Catálogo
+                      </Link>
 
-                              <div className="space-y-1 border-t border-outline-variant/10 pt-2">
-                                <div className="flex justify-between">
-                                  <span className="text-on-surface-variant text-[10px]">Total:</span>
-                                  <span className="font-semibold">{formatCurrency(ord.total, true)}</span>
+                      <button
+                        type="button"
+                        onClick={handleSignOut}
+                        disabled={loading}
+                        className="w-full h-12 border-2 border-red-200 text-red-500 hover:bg-red-50 rounded-xl font-bold flex items-center justify-center gap-2 transition-all active:scale-[0.98] disabled:opacity-50 cursor-pointer text-sm"
+                      >
+                        <LogOut className="w-4 h-4" />
+                        {loading ? 'Cerrando sesión...' : 'Cerrar Sesión'}
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* 2. User Orders Subpage */}
+                {profileActiveTab === 'pedidos' && (
+                  <div className="space-y-5 text-left animate-fade-in">
+                    {loadingOrders ? (
+                      <div className="py-8 flex flex-col items-center justify-center gap-2">
+                        <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+                        <p className="text-xs text-on-surface-variant">Cargando tus pedidos...</p>
+                      </div>
+                    ) : userOrders.length === 0 ? (
+                      <div className="text-center py-6 bg-surface rounded-2xl border border-outline-variant/20 p-4">
+                        <Package className="w-8 h-8 mx-auto text-outline mb-2" />
+                        <p className="text-xs text-on-surface-variant font-semibold">No tienes pedidos registrados con esta cuenta.</p>
+                      </div>
+                    ) : (
+                      <div className="space-y-3 max-h-[320px] overflow-y-auto pr-1 no-scrollbar">
+                        {userOrders.map((ord) => {
+                          const isExpanded = expandedUserOrderId === ord.id;
+                          const statusInfo = orderStatusDetails[ord.status as keyof typeof orderStatusDetails];
+                          return (
+                            <div key={ord.id} className="border border-outline-variant/30 rounded-xl overflow-hidden bg-surface-container-lowest">
+                              <div 
+                                onClick={() => setExpandedUserOrderId(isExpanded ? null : ord.id)}
+                                className="p-3.5 flex justify-between items-center cursor-pointer hover:bg-surface/30 select-none"
+                              >
+                                <div>
+                                  <span className="font-mono text-xs font-bold text-primary block">#{ord.id.substring(0, 8)}</span>
+                                  <span className="text-[10px] text-on-surface-variant">
+                                    {new Date(ord.created_at).toLocaleDateString('es-BO')}
+                                  </span>
                                 </div>
-                                <div className="flex justify-between text-green-700 font-medium">
-                                  <span className="text-[10px]">Adelanto recibido:</span>
-                                  <span className="font-bold">{formatCurrency(ord.monto_adelanto || 0, true)}</span>
-                                </div>
-                                <div className="flex justify-between border-t border-outline-variant/10 pt-1 font-bold">
-                                  <span>Saldo Pendiente:</span>
-                                  <span className={ord.saldo_pendiente > 0 ? "text-amber-600" : "text-green-600"}>
-                                    {formatCurrency(ord.saldo_pendiente, true)}
+                                <div className="text-right flex items-center gap-2">
+                                  <div className="mr-2">
+                                    <span className="text-[10px] text-on-surface-variant block">{ord.items.length} prendas</span>
+                                    <span className="text-xs font-bold text-on-surface">{formatCurrency(ord.total, true)}</span>
+                                  </div>
+                                  <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold border ${orderStatusColors[ord.status]}`}>
+                                    {orderStatuses[ord.status]}
                                   </span>
                                 </div>
                               </div>
 
-                              <div className="pt-1 flex gap-2">
-                                <Link
-                                  href={`/pedidos?ref=${ord.id.substring(0, 8)}`}
-                                  className="flex-grow py-2 bg-primary text-on-primary text-center font-bold rounded-lg text-[10px] hover:opacity-90 active:scale-95 transition-all"
-                                >
-                                  Detalles y Seguimiento
-                                </Link>
-                                <a
-                                  href={`https://wa.me/59171182580?text=${encodeURIComponent(
-                                    `Hola, me gustaría coordinar el saldo/entrega de mi pedido #${ord.id.substring(0, 8)}.`
-                                  )}`}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="px-3 bg-green-600 hover:bg-green-700 text-white flex items-center justify-center rounded-lg active:scale-95 transition-all cursor-pointer"
-                                  title="Coordinar en WhatsApp"
-                                >
-                                  <Phone className="w-3.5 h-3.5" />
-                                </a>
-                              </div>
+                              {isExpanded && (
+                                <div className="p-3.5 border-t border-outline-variant/10 bg-surface/20 space-y-3 text-xs">
+                                  <div className="space-y-1">
+                                    <span className="text-[9px] uppercase font-bold text-on-surface-variant block">Estado del Pedido</span>
+                                    <p className="font-bold text-on-surface">{statusInfo?.label}</p>
+                                    <p className="text-[10px] text-on-surface-variant leading-tight">{statusInfo?.description}</p>
+                                  </div>
+
+                                  <div className="space-y-1 border-t border-outline-variant/10 pt-2">
+                                    <div className="flex justify-between">
+                                      <span className="text-on-surface-variant text-[10px]">Total:</span>
+                                      <span className="font-semibold">{formatCurrency(ord.total, true)}</span>
+                                    </div>
+                                    <div className="flex justify-between text-green-700 font-medium">
+                                      <span className="text-[10px]">Adelanto recibido:</span>
+                                      <span className="font-bold">{formatCurrency(ord.monto_adelanto || 0, true)}</span>
+                                    </div>
+                                    <div className="flex justify-between border-t border-outline-variant/10 pt-1 font-bold">
+                                      <span>Saldo Pendiente:</span>
+                                      <span className={ord.saldo_pendiente > 0 ? "text-amber-600" : "text-green-600"}>
+                                        {formatCurrency(ord.saldo_pendiente, true)}
+                                      </span>
+                                    </div>
+                                  </div>
+
+                                  <div className="pt-1 flex gap-2">
+                                    <Link
+                                      href={`/pedidos?ref=${ord.id.substring(0, 8)}`}
+                                      className="flex-grow py-2 bg-primary text-on-primary text-center font-bold rounded-lg text-[10px] hover:opacity-90 active:scale-95 transition-all"
+                                    >
+                                      Detalles y Seguimiento
+                                    </Link>
+                                    <a
+                                      href={`https://wa.me/59171182580?text=${encodeURIComponent(
+                                        `Hola, me gustaría coordinar el saldo/entrega de mi pedido #${ord.id.substring(0, 8)}.`
+                                      )}`}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="px-3 bg-green-600 hover:bg-green-700 text-white flex items-center justify-center rounded-lg active:scale-95 transition-all cursor-pointer"
+                                      title="Coordinar en WhatsApp"
+                                    >
+                                      <Phone className="w-3.5 h-3.5" />
+                                    </a>
+                                  </div>
+                                </div>
+                              )}
                             </div>
-                          )}
+                          );
+                        })}
+                      </div>
+                    )}
+
+                    {/* Tracking search for guest checkouts */}
+                    <div className="border-t border-outline-variant/15 pt-4 space-y-3">
+                      <span className="text-[10px] uppercase font-extrabold tracking-wider text-on-surface-variant block">¿Pediste como invitado?</span>
+                      
+                      <form onSubmit={handleSearchGuestOrder} className="flex gap-2">
+                        <div className="relative flex-grow">
+                          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-outline w-3.5 h-3.5" />
+                          <input
+                            type="text"
+                            value={orderSearchQuery}
+                            onChange={(e) => setOrderSearchQuery(e.target.value)}
+                            placeholder="Código de referencia (ej: e3b8a1c9)"
+                            className="w-full h-9 pl-9 pr-3 bg-surface rounded-lg border border-outline-variant focus:border-primary text-xs outline-none uppercase font-mono tracking-wider"
+                          />
                         </div>
-                      );
-                    })}
+                        <button
+                          type="submit"
+                          disabled={searchingOrder}
+                          className="h-9 px-3 bg-primary text-on-primary text-xs font-bold rounded-lg hover:opacity-90 cursor-pointer active:scale-95 transition-all flex items-center justify-center shrink-0"
+                        >
+                          {searchingOrder ? '...' : 'Buscar'}
+                        </button>
+                      </form>
+
+                      {orderSearchError && (
+                        <p className="text-[10px] text-error font-medium">{orderSearchError}</p>
+                      )}
+
+                      {searchedOrder && (
+                        <div className="p-3 bg-green-50/50 border border-green-200/50 rounded-xl space-y-2 text-xs">
+                          <div className="flex justify-between">
+                            <span className="font-bold text-on-surface text-[11px]">Pedido #{searchedOrder.id.substring(0, 8)}</span>
+                            <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold border ${orderStatusColors[searchedOrder.status]}`}>
+                              {orderStatuses[searchedOrder.status]}
+                            </span>
+                          </div>
+                          <p className="text-[10px] text-on-surface-variant leading-tight">{orderStatusDetails[searchedOrder.status as keyof typeof orderStatusDetails]?.description}</p>
+                          <div className="flex justify-between border-t border-outline-variant/10 pt-1.5">
+                            <span className="font-semibold text-on-surface-variant text-[10px]">Saldo Restante:</span>
+                            <span className={searchedOrder.saldo_pendiente > 0 ? "font-bold text-amber-600" : "font-bold text-green-600"}>
+                              {formatCurrency(searchedOrder.saldo_pendiente, true)}
+                            </span>
+                          </div>
+                          <Link
+                            href={`/pedidos?ref=${searchedOrder.id.substring(0, 8)}`}
+                            className="block w-full py-1.5 bg-primary text-on-primary text-center font-bold rounded-md text-[10px] hover:opacity-90 active:scale-95 transition-all mt-1"
+                          >
+                            Ver Detalles y Timeline
+                          </Link>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 )}
 
-                {/* Tracking search for guest checkouts */}
-                <div className="border-t border-outline-variant/15 pt-4 space-y-3">
-                  <span className="text-[10px] uppercase font-extrabold tracking-wider text-on-surface-variant block">¿Pediste como invitado?</span>
-                  
-                  <form onSubmit={handleSearchGuestOrder} className="flex gap-2">
-                    <div className="relative flex-grow">
-                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-outline w-3.5 h-3.5" />
-                      <input
-                        type="text"
-                        value={orderSearchQuery}
-                        onChange={(e) => setOrderSearchQuery(e.target.value)}
-                        placeholder="Código de referencia (ej: e3b8a1c9)"
-                        className="w-full h-9 pl-9 pr-3 bg-surface rounded-lg border border-outline-variant focus:border-primary text-xs outline-none uppercase font-mono tracking-wider"
-                      />
-                    </div>
-                    <button
-                      type="submit"
-                      disabled={searchingOrder}
-                      className="h-9 px-3 bg-primary text-on-primary text-xs font-bold rounded-lg hover:opacity-90 cursor-pointer active:scale-95 transition-all flex items-center justify-center shrink-0"
-                    >
-                      {searchingOrder ? '...' : 'Buscar'}
-                    </button>
-                  </form>
-
-                  {orderSearchError && (
-                    <p className="text-[10px] text-error font-medium">{orderSearchError}</p>
-                  )}
-
-                  {searchedOrder && (
-                    <div className="p-3 bg-green-50/50 border border-green-200/50 rounded-xl space-y-2 text-xs">
-                      <div className="flex justify-between">
-                        <span className="font-bold text-on-surface text-[11px]">Pedido #{searchedOrder.id.substring(0, 8)}</span>
-                        <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold border ${orderStatusColors[searchedOrder.status]}`}>
-                          {orderStatuses[searchedOrder.status]}
-                        </span>
-                      </div>
-                      <p className="text-[10px] text-on-surface-variant leading-tight">{orderStatusDetails[searchedOrder.status as keyof typeof orderStatusDetails]?.description}</p>
-                      <div className="flex justify-between border-t border-outline-variant/10 pt-1.5">
-                        <span className="font-semibold text-on-surface-variant text-[10px]">Saldo Restante:</span>
-                        <span className={searchedOrder.saldo_pendiente > 0 ? "font-bold text-amber-600" : "font-bold text-green-600"}>
-                          {formatCurrency(searchedOrder.saldo_pendiente, true)}
-                        </span>
-                      </div>
-                      <Link
-                        href={`/pedidos?ref=${searchedOrder.id.substring(0, 8)}`}
-                        className="block w-full py-1.5 bg-primary text-on-primary text-center font-bold rounded-md text-[10px] hover:opacity-90 active:scale-95 transition-all mt-1"
-                      >
-                        Ver Detalles y Timeline
-                      </Link>
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
-
-            {/* 3. Help Center (FAQ) Subpage */}
-            {profileActiveTab === 'ayuda' && (
-              <div className="space-y-4 text-left animate-fade-in">
-                <div className="space-y-3 max-h-[350px] overflow-y-auto pr-1 no-scrollbar">
-                  {faqItems.map((faq, idx) => {
-                    const isOpen = activeFaqIdx === idx;
-                    return (
-                      <div key={idx} className="border border-outline-variant/30 rounded-xl overflow-hidden bg-surface-container-lowest shadow-2xs">
-                        <button
-                          type="button"
-                          onClick={() => setActiveFaqIdx(isOpen ? null : idx)}
-                          className="w-full p-4 flex justify-between items-center text-left font-bold text-xs text-on-surface hover:bg-surface/30 select-none cursor-pointer"
-                        >
-                          <span className="pr-2">{faq.q}</span>
-                          {isOpen ? <ChevronUp className="w-4 h-4 text-outline shrink-0" /> : <ChevronDown className="w-4 h-4 text-outline shrink-0" />}
-                        </button>
-                        {isOpen && (
-                          <div className="p-4 border-t border-outline-variant/10 bg-surface/10 text-xs text-on-surface-variant leading-relaxed">
-                            {faq.a}
+                {/* 3. Help Center (FAQ) Subpage */}
+                {profileActiveTab === 'ayuda' && (
+                  <div className="space-y-4 text-left animate-fade-in">
+                    <div className="space-y-3 max-h-[350px] overflow-y-auto pr-1 no-scrollbar">
+                      {faqItems.map((faq, idx) => {
+                        const isOpen = activeFaqIdx === idx;
+                        return (
+                          <div key={idx} className="border border-outline-variant/30 rounded-xl overflow-hidden bg-surface-container-lowest shadow-2xs">
+                            <button
+                              type="button"
+                              onClick={() => setActiveFaqIdx(isOpen ? null : idx)}
+                              className="w-full p-4 flex justify-between items-center text-left font-bold text-xs text-on-surface hover:bg-surface/30 select-none cursor-pointer"
+                            >
+                              <span className="pr-2">{faq.q}</span>
+                              {isOpen ? <ChevronUp className="w-4 h-4 text-outline shrink-0" /> : <ChevronDown className="w-4 h-4 text-outline shrink-0" />}
+                            </button>
+                            {isOpen && (
+                              <div className="p-4 border-t border-outline-variant/10 bg-surface/10 text-xs text-on-surface-variant leading-relaxed">
+                                {faq.a}
+                              </div>
+                            )}
                           </div>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
               </div>
-            )}
+            </div>
 
             {/* EDIT PROFILE MODAL DIALOG OVERLAY */}
             {isEditingProfile && (
@@ -825,11 +836,13 @@ export default function LoginPage() {
                     {/* Avatar Preview & Upload Area */}
                     <div className="flex flex-col items-center gap-3 p-4 bg-surface rounded-2xl border border-outline-variant/30">
                       <div className="relative">
-                        {editAvatarUrl ? (
+                        {editAvatarUrl && !editAvatarImgError ? (
                           <img
                             src={editAvatarUrl}
                             alt="Vista previa de avatar"
                             className="w-20 h-20 rounded-full object-cover border-2 border-primary/20 shadow"
+                            referrerPolicy="no-referrer"
+                            onError={() => setEditAvatarImgError(true)}
                           />
                         ) : (
                           <div className="w-20 h-20 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-3xl uppercase">

@@ -42,9 +42,15 @@ export default function Header() {
 
   useEffect(() => {
     // Get initial session
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      setUser(user);
-    });
+    const getInitialUser = async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        setUser(user);
+      } catch (err) {
+        console.error('Error fetching initial user in Header:', err);
+      }
+    };
+    getInitialUser();
 
     // Listen to changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
@@ -65,6 +71,16 @@ export default function Header() {
       subscription.unsubscribe();
     };
   }, []);
+
+  const [avatarError, setAvatarError] = useState(false);
+
+  useEffect(() => {
+    setAvatarError(false);
+  }, [user, profile]);
+
+  const headerAvatarUrl = (profile?.avatar_url && profile.avatar_url.trim() !== '')
+    ? profile.avatar_url
+    : (user?.user_metadata?.avatar_url || user?.user_metadata?.picture || '');
 
   return (
     <header
@@ -106,37 +122,6 @@ export default function Header() {
             >
               Catálogo
             </Link>
-            {user ? (
-              <Link
-                href="/login"
-                className="flex items-center gap-2 hover:opacity-80 transition-all"
-              >
-                {profile?.avatar_url || user.user_metadata?.avatar_url || user.user_metadata?.picture ? (
-                  <img
-                    src={profile?.avatar_url || user.user_metadata.avatar_url || user.user_metadata.picture}
-                    alt={profile?.full_name || user.user_metadata.full_name || 'Perfil'}
-                    className="w-8 h-8 rounded-full border border-primary/20 object-cover shadow-sm"
-                    referrerPolicy="no-referrer"
-                  />
-                ) : (
-                  <div className="w-8 h-8 rounded-full bg-primary text-on-primary flex items-center justify-center font-bold text-sm shadow-sm uppercase">
-                    {(profile?.full_name || user.user_metadata?.full_name || user.email || 'U').charAt(0)}
-                  </div>
-                )}
-                <span className="hidden sm:inline font-bold text-label-md uppercase tracking-wider text-on-surface">
-                  {(profile?.full_name || user.user_metadata?.full_name || user.email)?.split(' ')[0] || 'Mi Perfil'}
-                </span>
-              </Link>
-            ) : (
-              <Link
-                className={`font-bold text-label-md uppercase tracking-wider transition-colors ${
-                  pathname === '/login' ? 'text-primary' : 'text-on-surface hover:text-primary'
-                }`}
-                href="/login"
-              >
-                Mi Perfil
-              </Link>
-            )}
           </nav>
 
           <div className="flex items-center gap-1 md:gap-2">
@@ -154,6 +139,40 @@ export default function Header() {
                 </span>
               )}
             </Link>
+
+            {/* Profile Link (desktop only, placed after the cart icon) */}
+            {user ? (
+              <Link
+                href="/login"
+                className="hidden lg:flex items-center gap-2 hover:opacity-80 transition-all ml-3"
+              >
+                {headerAvatarUrl && !avatarError ? (
+                  <img
+                    src={headerAvatarUrl}
+                    alt={profile?.full_name || user.user_metadata?.full_name || 'Perfil'}
+                    className="w-8 h-8 rounded-full border border-primary/20 object-cover shadow-sm"
+                    referrerPolicy="no-referrer"
+                    onError={() => setAvatarError(true)}
+                  />
+                ) : (
+                  <div className="w-8 h-8 rounded-full bg-primary text-on-primary flex items-center justify-center font-bold text-sm shadow-sm uppercase">
+                    {(profile?.full_name || user.user_metadata?.full_name || user.email || 'U').charAt(0)}
+                  </div>
+                )}
+                <span className="font-bold text-label-md uppercase tracking-wider text-on-surface">
+                  {(profile?.full_name || user.user_metadata?.full_name || user.email)?.split(' ')[0] || 'Mi Perfil'}
+                </span>
+              </Link>
+            ) : (
+              <Link
+                className={`hidden lg:flex font-bold text-label-md uppercase tracking-wider transition-colors ml-3 ${
+                  pathname === '/login' ? 'text-primary' : 'text-on-surface hover:text-primary'
+                }`}
+                href="/login"
+              >
+                Mi Perfil
+              </Link>
+            )}
           </div>
         </div>
       </div>

@@ -28,6 +28,37 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [profile, setProfile] = useState<{ full_name: string; avatar_url: string } | null>(null);
+  const [avatarError, setAvatarError] = useState(false);
+
+  useEffect(() => {
+    if (user) {
+      const getProfile = async () => {
+        try {
+          const { data } = await supabase
+            .from('profiles')
+            .select('full_name, avatar_url')
+            .eq('id', user.id)
+            .maybeSingle();
+          if (data) {
+            setProfile({
+              full_name: data.full_name || '',
+              avatar_url: data.avatar_url || ''
+            });
+          }
+        } catch (err) {
+          console.error('Error loading admin profile:', err);
+        }
+      };
+      getProfile();
+    } else {
+      setProfile(null);
+    }
+  }, [user]);
+
+  useEffect(() => {
+    setAvatarError(false);
+  }, [user, profile]);
   
   // Sidebar states
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
@@ -103,8 +134,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   if (!user) return null;
 
-  const displayName = user.user_metadata?.full_name || user.user_metadata?.name || user.email?.split('@')[0] || 'Administrador';
-  const userAvatar = user.user_metadata?.avatar_url || user.user_metadata?.picture;
+  const displayName = profile?.full_name || user.user_metadata?.full_name || user.user_metadata?.name || user.email?.split('@')[0] || 'Administrador';
+  const rawAvatar = (profile?.avatar_url && profile.avatar_url.trim() !== '')
+    ? profile.avatar_url
+    : (user.user_metadata?.avatar_url || user.user_metadata?.picture || '');
+  const userAvatar = avatarError ? '' : rawAvatar;
 
   return (
     <div className={`min-h-screen bg-surface-container-low text-on-surface font-manrope transition-all duration-300 ${sidebarCollapsed ? 'sidebar-collapsed' : ''}`}>
@@ -278,6 +312,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                     className="w-full h-full object-cover"
                     src={userAvatar}
                     referrerPolicy="no-referrer"
+                    onError={() => setAvatarError(true)}
                   />
                 ) : (
                   <div className="w-full h-full bg-primary/10 text-primary flex items-center justify-center font-bold uppercase">

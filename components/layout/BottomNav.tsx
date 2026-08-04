@@ -38,9 +38,15 @@ export default function BottomNav() {
 
   useEffect(() => {
     // Get initial session
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      setUser(user);
-    });
+    const getInitialUser = async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        setUser(user);
+      } catch (err) {
+        console.error('Error fetching initial user in BottomNav:', err);
+      }
+    };
+    getInitialUser();
 
     // Listen to changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
@@ -61,6 +67,16 @@ export default function BottomNav() {
   };
 
   const activeTab = getActiveTab();
+
+  const [avatarError, setAvatarError] = useState(false);
+
+  useEffect(() => {
+    setAvatarError(false);
+  }, [user, profile]);
+
+  const navAvatarUrl = (profile?.avatar_url && profile.avatar_url.trim() !== '')
+    ? profile.avatar_url
+    : (user?.user_metadata?.avatar_url || user?.user_metadata?.picture || '');
 
   return (
     <nav className="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 py-3 pb-safe bg-secondary shadow-[0px_-4px_20px_rgba(0,0,0,0.08)] rounded-t-xl lg:hidden">
@@ -90,7 +106,7 @@ export default function BottomNav() {
 
       <Link
         href="/cesta"
-        className={`flex flex-col items-center justify-center transition-all duration-300 ease-out active:scale-90 relative ${
+        className={`flex flex-col items-center justify-center relative transition-all duration-300 ease-out active:scale-90 ${
           activeTab === 'cesta'
             ? 'scale-110 text-on-secondary font-bold'
             : 'text-on-secondary/70 hover:bg-on-secondary/10 rounded-lg p-1'
@@ -99,7 +115,7 @@ export default function BottomNav() {
         <ShoppingCart className="w-6 h-6" fill={activeTab === 'cesta' ? 'currentColor' : 'none'} />
         <span className="font-label-md text-label-md mt-1">Cesta</span>
         {isLoaded && cartCount > 0 && (
-          <span className="absolute top-0 -right-1 bg-on-secondary text-secondary text-[10px] w-4 h-4 flex items-center justify-center rounded-full border border-secondary font-bold">
+          <span className="absolute top-0 right-1 text-white text-[10px] w-4 h-4 flex items-center justify-center rounded-full border border-white bg-primary font-bold">
             {cartCount}
           </span>
         )}
@@ -113,12 +129,13 @@ export default function BottomNav() {
             : 'text-on-secondary/70 hover:bg-on-secondary/10 rounded-lg p-1'
         }`}
       >
-        {user && (profile?.avatar_url || user.user_metadata?.avatar_url || user.user_metadata?.picture) ? (
+        {user && navAvatarUrl && !avatarError ? (
           <img
-            src={profile?.avatar_url || user.user_metadata.avatar_url || user.user_metadata.picture}
+            src={navAvatarUrl}
             alt="Perfil"
             className="w-6 h-6 rounded-full border border-on-secondary/20 object-cover"
             referrerPolicy="no-referrer"
+            onError={() => setAvatarError(true)}
           />
         ) : (
           <UserIcon className="w-6 h-6" fill={activeTab === 'perfil' ? 'currentColor' : 'none'} />
