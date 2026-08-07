@@ -19,7 +19,8 @@ import {
   Menu, 
   Search, 
   Bell, 
-  HelpCircle 
+  HelpCircle,
+  Sparkles
 } from 'lucide-react';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -206,6 +207,18 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           >
             <Package className="w-5 h-5 shrink-0" fill={pathname.startsWith('/admin/productos') ? 'currentColor' : 'none'} />
             {!sidebarCollapsed && <span className="font-beVietnamPro text-body-md">Productos</span>}
+          </Link>
+
+          <Link
+            href="/admin/home"
+            className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
+              pathname.startsWith('/admin/home')
+                ? 'text-primary font-bold border-r-4 border-primary bg-surface-container-high'
+                : 'text-on-surface-variant hover:bg-surface-container-high hover:text-primary'
+            }`}
+          >
+            <Sparkles className="w-5 h-5 shrink-0" fill={pathname.startsWith('/admin/home') ? 'currentColor' : 'none'} />
+            {!sidebarCollapsed && <span className="font-beVietnamPro text-body-md">Contenido Home</span>}
           </Link>
 
           <Link
