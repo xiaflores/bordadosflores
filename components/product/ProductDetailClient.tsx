@@ -22,7 +22,9 @@ import {
   ShoppingBasket, 
   Loader2, 
   CheckCircle, 
-  MessageSquare 
+  MessageSquare,
+  Share2,
+  Copy
 } from 'lucide-react';
 
 interface ProductDetailClientProps {
@@ -37,6 +39,26 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
   const [shippingDestination, setShippingDestination] = useState('or');
   const [customShippingLocation, setCustomShippingLocation] = useState('');
   const [cartState, setCartState] = useState<'idle' | 'processing' | 'added'>('idle');
+  const [copiedLink, setCopiedLink] = useState(false);
+
+  const handleShareWhatsApp = () => {
+    const pageUrl = window.location.href;
+    const text = `Mira esta hermosa prenda artesanal: *${product.name}* (${formatCurrency(currentPrice)})\n${pageUrl}`;
+    window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
+  };
+
+  const handleShareFacebook = () => {
+    const pageUrl = window.location.href;
+    window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(pageUrl)}`, '_blank');
+  };
+
+  const handleCopyLink = () => {
+    if (typeof window !== 'undefined') {
+      navigator.clipboard.writeText(window.location.href);
+      setCopiedLink(true);
+      setTimeout(() => setCopiedLink(false), 2500);
+    }
+  };
 
   // Sync shipping destination selection with localStorage for the cart page
   useEffect(() => {
@@ -59,6 +81,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
   const [selectedLength, setSelectedLength] = useState<number | 'otro'>(product.largo || 45);
   const [customLength, setCustomLength] = useState('');
   const [waistMeasurement, setWaistMeasurement] = useState('');
+  const [polleraDeliveryDate, setPolleraDeliveryDate] = useState('');
 
   // Jackets Customization
   const [selectedJacketSize, setSelectedJacketSize] = useState('M');
@@ -69,7 +92,9 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
     // Set default date to 15 days from now
     const minDate = new Date();
     minDate.setDate(minDate.getDate() + 15);
-    setJacketDeliveryDate(minDate.toISOString().split('T')[0]);
+    const minDateStr = minDate.toISOString().split('T')[0];
+    setJacketDeliveryDate(minDateStr);
+    setPolleraDeliveryDate(minDateStr);
   }, []);
 
   const getMinDeliveryDateString = () => {
@@ -128,7 +153,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
         cartItemAttributes.panos = selectedPanels;
         cartItemAttributes.largo = selectedLength === 'otro' ? Number(customLength) || 45 : selectedLength;
         cartItemAttributes.cintura = waistMeasurement || 'No especificada';
-        cartItemAttributes.fechaEntrega = getEstimatedDate();
+        cartItemAttributes.fechaEntrega = polleraDeliveryDate || getEstimatedDate();
       } else {
         cartItemAttributes.colorName = product.color_name || 'Único';
         cartItemAttributes.colorHex = product.color_hex || '#000000';
@@ -179,7 +204,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
           : `${selectedLength} cm`;
         attributes.push({ label: 'Largo', value: lengthText });
         attributes.push({ label: 'Cintura', value: waistMeasurement ? `${waistMeasurement} cm` : 'No especificada' });
-        attributes.push({ label: 'Tiempo de Confección', value: '15-20 días' });
+        attributes.push({ label: 'Fecha Entrega Deseada', value: polleraDeliveryDate || getEstimatedDate() });
       } else {
         attributes.push({ label: 'Color', value: product.color_name || 'Tono Único' });
         if (product.largo) attributes.push({ label: 'Largo', value: `${product.largo} cm` });
@@ -453,15 +478,24 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                   </div>
                 </div>
 
-                {/* Estimated Delivery Date */}
+                {/* Estimated / Custom Delivery Date Selector */}
                 <div className="space-y-2">
                   <label className="font-label-md text-label-md text-on-surface-variant block tracking-wider uppercase">
-                    Fecha de Entrega Estimada
+                    Fecha de Entrega Deseada
                   </label>
-                  <div className="p-4 bg-surface rounded-lg border border-outline-variant flex items-center justify-between">
-                    <span className="font-semibold text-on-surface">{getEstimatedDate()}</span>
-                    <Calendar className="w-5 h-5 text-on-surface-variant" />
+                  <div className="relative group">
+                    <input
+                      type="date"
+                      value={polleraDeliveryDate}
+                      min={getMinDeliveryDateString()}
+                      onChange={(e) => setPolleraDeliveryDate(e.target.value)}
+                      className="w-full p-4 pr-12 bg-white border border-outline-variant rounded-xl font-body-md text-on-surface focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all cursor-pointer shadow-xs"
+                    />
+                    <Calendar className="w-5 h-5 absolute right-4 top-1/2 -translate-y-1/2 text-outline pointer-events-none group-focus-within:text-primary" />
                   </div>
+                  <p className="text-[11px] text-on-surface-variant/80 font-medium pt-1">
+                    Plazo mínimo sugerido de confección: <span className="font-bold text-primary">{getEstimatedDate()}</span>
+                  </p>
                 </div>
               </section>
             ) : (
@@ -799,6 +833,51 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
               <MessageSquare className="w-5 h-5" />
               Consultar Detalles
             </button>
+
+            {/* Social Share Section */}
+            <div className="pt-3 space-y-2 border-t border-outline-variant/20 mt-2">
+              <span className="text-[11px] font-extrabold text-on-surface-variant uppercase tracking-widest block">
+                Compartir
+              </span>
+              <div className="grid grid-cols-3 gap-2">
+                <button
+                  type="button"
+                  onClick={handleShareWhatsApp}
+                  className="py-3 px-3 bg-green-50 text-green-700 border border-green-200 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 hover:bg-green-100 transition-all active:scale-95 cursor-pointer shadow-2xs"
+                  title="Compartir enlace con vista previa en WhatsApp"
+                >
+                  <MessageSquare className="w-4 h-4 text-green-600" />
+                  WhatsApp
+                </button>
+                <button
+                  type="button"
+                  onClick={handleShareFacebook}
+                  className="py-3 px-3 bg-blue-50 text-blue-700 border border-blue-200 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 hover:bg-blue-100 transition-all active:scale-95 cursor-pointer shadow-2xs"
+                  title="Compartir en Facebook"
+                >
+                  <Share2 className="w-4 h-4 text-blue-600" />
+                  Facebook
+                </button>
+                <button
+                  type="button"
+                  onClick={handleCopyLink}
+                  className="py-3 px-3 bg-surface-container text-on-surface border border-outline-variant/30 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 hover:bg-surface-container-high transition-all active:scale-95 cursor-pointer shadow-2xs"
+                  title="Copiar enlace directo del producto"
+                >
+                  {copiedLink ? (
+                    <>
+                      <Check className="w-4 h-4 text-green-600" />
+                      <span className="text-green-600">¡Copiado!</span>
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="w-4 h-4 text-on-surface-variant" />
+                      Copiar Link
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </main>
