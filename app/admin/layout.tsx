@@ -20,7 +20,8 @@ import {
   Search, 
   Bell, 
   HelpCircle,
-  Sparkles
+  Sparkles,
+  Users
 } from 'lucide-react';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -219,6 +220,18 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           >
             <Sparkles className="w-5 h-5 shrink-0" fill={pathname.startsWith('/admin/home') ? 'currentColor' : 'none'} />
             {!sidebarCollapsed && <span className="font-beVietnamPro text-body-md">Contenido Home</span>}
+          </Link>
+
+          <Link
+            href="/admin/usuarios"
+            className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
+              pathname.startsWith('/admin/usuarios')
+                ? 'text-primary font-bold border-r-4 border-primary bg-surface-container-high'
+                : 'text-on-surface-variant hover:bg-surface-container-high hover:text-primary'
+            }`}
+          >
+            <Users className="w-5 h-5 shrink-0" fill={pathname.startsWith('/admin/usuarios') ? 'currentColor' : 'none'} />
+            {!sidebarCollapsed && <span className="font-beVietnamPro text-body-md">Usuarios</span>}
           </Link>
 
           <Link

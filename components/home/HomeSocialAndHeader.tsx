@@ -1,12 +1,17 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { HomeTexts, getStoredHomeTexts } from '@/lib/homeContent';
+import { HomeTexts, DEFAULT_HOME_TEXTS, getStoredHomeTexts } from '@/lib/homeContent';
 
 export default function HomeSocialAndHeader() {
-  const [texts, setTexts] = useState<HomeTexts>(getStoredHomeTexts());
+  const [texts, setTexts] = useState<HomeTexts>(DEFAULT_HOME_TEXTS);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    // Load from localStorage only on the client after mount
+    setTexts(getStoredHomeTexts());
+    setMounted(true);
+
     const handleUpdate = () => {
       setTexts(getStoredHomeTexts());
     };
