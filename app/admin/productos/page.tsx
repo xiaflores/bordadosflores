@@ -46,6 +46,7 @@ export default function AdminProductsPage() {
       const { data, error } = await supabase
         .from('productos')
         .select('id, name, category, price, availability, imageUrl, featured')
+        .neq('id', '00000000-0000-0000-0000-000000000000')
         .order('id', { ascending: true });
 
       if (error) throw error;

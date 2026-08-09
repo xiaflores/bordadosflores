@@ -110,11 +110,28 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
 
   // Helper to lookup custom panel price or calculate fallback
   const getPriceForPanels = (panels: number) => {
-    const customPrices = product.precios_panos as Record<string, number> | null | undefined;
     const panelKey = String(panels);
+
+    // 1. Check if column exists
+    const customPrices = product.precios_panos as Record<string, number> | null | undefined;
     if (customPrices && typeof customPrices === 'object' && customPrices[panelKey] != null) {
       return Number(customPrices[panelKey]);
     }
+
+    // 2. Check tags encoding
+    if (Array.isArray(product.tags)) {
+      const panosTag = product.tags.find((t: string) => typeof t === 'string' && t.startsWith('PRECIOS_PANOS:'));
+      if (panosTag) {
+        try {
+          const parsed = JSON.parse(panosTag.replace('PRECIOS_PANOS:', ''));
+          if (parsed && parsed[panelKey] != null) {
+            return Number(parsed[panelKey]);
+          }
+        } catch (e) {}
+      }
+    }
+
+    // 3. Fallback to standard formula
     return Math.round((product.price / basePanels) * panels);
   };
 

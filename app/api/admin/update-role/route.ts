@@ -2,8 +2,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
 export async function POST(request: NextRequest) {
-  console.log('[API update-role] POST request received');
-  
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
   const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -100,15 +98,11 @@ export async function POST(request: NextRequest) {
       }
     });
 
-    console.log('[API update-role] Executing update: userId=', userId, 'newRole=', newRole);
-
     const { data: updateData, error: updateError } = await supabaseAdmin
       .from('profiles')
       .update({ role: newRole })
       .eq('id', userId)
       .select('id, role');
-
-    console.log('[API update-role] Update result:', { data: updateData, error: updateError });
 
     if (updateError) {
       console.error('[API update-role] Error updating role in profiles:', updateError);
@@ -119,14 +113,11 @@ export async function POST(request: NextRequest) {
     }
 
     if (!updateData || updateData.length === 0) {
-      console.error('[API update-role] No rows updated. User may not exist in profiles.');
       return NextResponse.json(
         { error: 'No se encontró el usuario en la base de datos.' },
         { status: 404 }
       );
     }
-
-    console.log('[API update-role] Success! Updated profile:', updateData[0]);
 
     return NextResponse.json({
       success: true,

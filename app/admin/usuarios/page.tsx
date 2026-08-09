@@ -134,8 +134,6 @@ export default function AdminUsuariosPage() {
         throw new Error('No hay sesión activa. Intenta cerrar sesión e iniciar de nuevo.');
       }
 
-      console.log('[Admin] Updating role for user:', userId, 'to:', newRole);
-
       const response = await fetch('/api/admin/update-role', {
         method: 'POST',
         headers: {
@@ -146,7 +144,6 @@ export default function AdminUsuariosPage() {
       });
 
       const result = await response.json();
-      console.log('[Admin] API Response:', response.status, result);
 
       if (!response.ok) {
         throw new Error(result.error || `Error del servidor (${response.status}).`);

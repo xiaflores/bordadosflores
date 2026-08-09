@@ -11,6 +11,7 @@ export default async function Home() {
   const { data: rawProducts, error } = await supabase
     .from('productos')
     .select('*')
+    .neq('id', '00000000-0000-0000-0000-000000000000')
     .eq('featured', true)
     .order('id', { ascending: true });
 

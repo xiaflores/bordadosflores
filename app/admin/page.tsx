@@ -98,7 +98,8 @@ export default function AdminDashboard() {
       // 1. Fetch Products
       const { data: products, error: prodError } = await supabase
         .from('productos')
-        .select('id, name, category, availability, featured, imageUrl, talla');
+        .select('id, name, category, availability, featured, imageUrl, talla')
+        .neq('id', '00000000-0000-0000-0000-000000000000');
 
       if (prodError) throw prodError;
 

@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { DEFAULT_HERO_SLIDES, DEFAULT_HOME_TEXTS } from '@/lib/homeContent';
 
+const SYS_CONFIG_ID = '00000000-0000-0000-0000-000000000000';
+
 export async function GET() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -16,24 +18,26 @@ export async function GET() {
   try {
     const supabase = createClient(supabaseUrl, anonKey);
     const { data, error } = await supabase
-      .from('home_config')
-      .select('slides, texts')
-      .eq('id', 'default')
+      .from('productos')
+      .select('description')
+      .eq('id', SYS_CONFIG_ID)
       .maybeSingle();
 
-    if (error || !data) {
+    if (error || !data || !data.description) {
       return NextResponse.json({
         slides: DEFAULT_HERO_SLIDES,
         texts: DEFAULT_HOME_TEXTS
       });
     }
 
+    const parsed = JSON.parse(data.description);
+
     return NextResponse.json({
-      slides: data.slides && Array.isArray(data.slides) && data.slides.length > 0 ? data.slides : DEFAULT_HERO_SLIDES,
-      texts: data.texts ? { ...DEFAULT_HOME_TEXTS, ...data.texts } : DEFAULT_HOME_TEXTS
+      slides: parsed.slides && Array.isArray(parsed.slides) && parsed.slides.length > 0 ? parsed.slides : DEFAULT_HERO_SLIDES,
+      texts: parsed.texts ? { ...DEFAULT_HOME_TEXTS, ...parsed.texts } : DEFAULT_HOME_TEXTS
     });
   } catch (err) {
-    console.error('Error fetching home config:', err);
+    console.error('Error fetching home config from productos table:', err);
     return NextResponse.json({
       slides: DEFAULT_HERO_SLIDES,
       texts: DEFAULT_HOME_TEXTS
@@ -88,31 +92,39 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { slides, texts } = body;
 
+    const payload = {
+      id: SYS_CONFIG_ID,
+      name: 'SYS_HOME_CONFIG',
+      category: 'Textiles',
+      price: 0,
+      availability: 'En Stock',
+      imageUrl: 'https://via.placeholder.com/1',
+      description: JSON.stringify({
+        slides: slides || DEFAULT_HERO_SLIDES,
+        texts: texts || DEFAULT_HOME_TEXTS
+      })
+    };
+
     // 5. Initialize admin client
     const supabaseAdmin = createClient(supabaseUrl, serviceRoleKey, {
       auth: { autoRefreshToken: false, persistSession: false }
     });
 
     const { error: upsertError } = await supabaseAdmin
-      .from('home_config')
-      .upsert({
-        id: 'default',
-        slides: slides || DEFAULT_HERO_SLIDES,
-        texts: texts || DEFAULT_HOME_TEXTS,
-        updated_at: new Date().toISOString()
-      });
+      .from('productos')
+      .upsert(payload);
 
     if (upsertError) {
-      console.error('[API home-config] Error upserting home_config:', upsertError);
+      console.error('[API home-config] Error upserting sys_home_config:', upsertError);
       return NextResponse.json(
-        { error: `Error al guardar en base de datos: ${upsertError.message}` },
+        { error: `Error al guardar en Supabase DB: ${upsertError.message}` },
         { status: 500 }
       );
     }
 
     return NextResponse.json({
       success: true,
-      message: 'Configuración del inicio actualizada globalmente.'
+      message: 'Configuración del inicio actualizada globalmente en Supabase DB.'
     });
 
   } catch (error: any) {

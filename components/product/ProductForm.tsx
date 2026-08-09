@@ -39,6 +39,7 @@ export default function ProductForm({ productId }: ProductFormProps) {
   const [description, setDescription] = useState('');
   const [imageUrl, setImageUrl] = useState('');
   const [images, setImages] = useState<string[]>([]);
+  const [tags, setTags] = useState<string[]>([]);
   const [newImageUrl, setNewImageUrl] = useState('');
   const [uploadingMain, setUploadingMain] = useState(false);
   const [uploadingGallery, setUploadingGallery] = useState(false);
@@ -125,15 +126,21 @@ export default function ProductForm({ productId }: ProductFormProps) {
           setPanos(data.panos || '');
 
           // Custom panel prices
+          let loadedPanos: Record<string, number | ''> = { '6': '', '8': '', '10': '', '12': '', '14': '' };
           if (data.precios_panos && typeof data.precios_panos === 'object') {
-            setPreciosPanos({
-              '6': data.precios_panos['6'] ?? '',
-              '8': data.precios_panos['8'] ?? '',
-              '10': data.precios_panos['10'] ?? '',
-              '12': data.precios_panos['12'] ?? '',
-              '14': data.precios_panos['14'] ?? ''
-            });
+            loadedPanos = { ...loadedPanos, ...data.precios_panos };
           }
+          if (Array.isArray(data.tags)) {
+            const panosTag = data.tags.find((t: string) => typeof t === 'string' && t.startsWith('PRECIOS_PANOS:'));
+            if (panosTag) {
+              try {
+                const parsed = JSON.parse(panosTag.replace('PRECIOS_PANOS:', ''));
+                loadedPanos = { ...loadedPanos, ...parsed };
+              } catch (e) {}
+            }
+            setTags(data.tags.filter((t: string) => typeof t === 'string' && !t.startsWith('PRECIOS_PANOS:')));
+          }
+          setPreciosPanos(loadedPanos);
         }
       } catch (err: any) {
         console.error('Error fetching product:', err);
@@ -178,6 +185,12 @@ export default function ProductForm({ productId }: ProductFormProps) {
       }
     });
 
+    // Build tags array containing custom panel prices encoding
+    const finalTags = (tags || []).filter((t: string) => !t.startsWith('PRECIOS_PANOS:'));
+    if (Object.keys(cleanedPreciosPanos).length > 0) {
+      finalTags.push(`PRECIOS_PANOS:${JSON.stringify(cleanedPreciosPanos)}`);
+    }
+
     const productPayload = {
       name,
       category,
@@ -186,14 +199,14 @@ export default function ProductForm({ productId }: ProductFormProps) {
       imageUrl,
       description,
       images,
+      tags: finalTags,
       // Spec attributes
       color_name: colorName || null,
       color_hex: colorHex || null,
       talla: talla || null,
       largo: largo ? Number(largo) : null,
       cintura: cintura ? Number(cintura) : null,
-      panos: panos ? Number(panos) : null,
-      precios_panos: Object.keys(cleanedPreciosPanos).length > 0 ? cleanedPreciosPanos : null
+      panos: panos ? Number(panos) : null
     };
 
     try {
@@ -220,7 +233,8 @@ export default function ProductForm({ productId }: ProductFormProps) {
       }, 1500);
     } catch (err: any) {
       console.error('Error saving product:', err);
-      setErrorMsg(err.message || 'Ocurrió un error al guardar el producto.');
+      const detailedMsg = err?.message || err?.details || err?.hint || (typeof err === 'object' && Object.keys(err).length ? JSON.stringify(err) : '');
+      setErrorMsg(detailedMsg || 'Ocurrió un error al guardar el producto en Supabase.');
       setLoading(false);
     }
   };
