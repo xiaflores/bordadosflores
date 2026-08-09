@@ -17,4 +17,5 @@ export interface Product {
   panos?: number;
   talla?: string;
   slug?: string;
+  precios_panos?: Record<string, number> | null;
 }

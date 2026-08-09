@@ -1,13 +1,13 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const token = request.cookies.get('sb-access-token')?.value;
 
   const loginUrl = new URL('/login', request.url);
   const homeUrl = new URL('/', request.url);
 
-  // If there's no token cookie, redirect immediately to login page
+  // 1. If there's no token cookie, redirect immediately to login page
   if (!token) {
     return NextResponse.redirect(loginUrl);
   }
@@ -16,12 +16,12 @@ export async function middleware(request: NextRequest) {
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
   if (!supabaseUrl || !supabaseAnonKey) {
-    console.error('Missing Supabase environment variables in middleware.');
+    console.error('Missing Supabase environment variables in proxy.');
     return NextResponse.redirect(loginUrl);
   }
 
   try {
-    // 1. Validate the JWT token against Supabase Auth API
+    // 2. Validate the JWT token against Supabase Auth API
     const userResponse = await fetch(`${supabaseUrl}/auth/v1/user`, {
       headers: {
         apikey: supabaseAnonKey,
@@ -40,7 +40,7 @@ export async function middleware(request: NextRequest) {
     const userData = await userResponse.json();
     const userId = userData.id;
 
-    // 2. Fetch the user's role from the public.profiles table
+    // 3. Fetch the user's role from the public.profiles table
     const profileResponse = await fetch(
       `${supabaseUrl}/rest/v1/profiles?id=eq.${userId}&select=role`,
       {
@@ -58,7 +58,7 @@ export async function middleware(request: NextRequest) {
     const profileData = await profileResponse.json();
     const role = profileData[0]?.role;
 
-    // 3. Enforce admin role for /admin paths
+    // 4. Enforce admin role for /admin paths
     if (role !== 'admin') {
       // Redirect authenticated but unauthorized users to home page
       return NextResponse.redirect(homeUrl);
@@ -68,12 +68,12 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
 
   } catch (error) {
-    console.error('Exception in authorization middleware:', error);
+    console.error('Exception in authorization proxy:', error);
     return NextResponse.redirect(loginUrl);
   }
 }
 
-// Run middleware only on admin routes
+// Run proxy only on admin routes
 export const config = {
   matcher: ['/admin/:path*'],
 };

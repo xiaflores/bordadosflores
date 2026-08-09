@@ -40,6 +40,8 @@ export default function ProductForm({ productId }: ProductFormProps) {
   const [imageUrl, setImageUrl] = useState('');
   const [images, setImages] = useState<string[]>([]);
   const [newImageUrl, setNewImageUrl] = useState('');
+  const [uploadingMain, setUploadingMain] = useState(false);
+  const [uploadingGallery, setUploadingGallery] = useState(false);
 
   // Dynamic spec attributes
   const [colorName, setColorName] = useState('');
@@ -48,6 +50,47 @@ export default function ProductForm({ productId }: ProductFormProps) {
   const [largo, setLargo] = useState<number | ''>(''); // Length (Polleras)
   const [cintura, setCintura] = useState<number | ''>(''); // Waist (Polleras)
   const [panos, setPanos] = useState<number | ''>(''); // Pleats (Polleras)
+
+  // Custom pricing per panel count (Polleras / A Pedido)
+  const [preciosPanos, setPreciosPanos] = useState<Record<string, number | ''>>({
+    '6': '',
+    '8': '',
+    '10': '',
+    '12': '',
+    '14': ''
+  });
+
+  const uploadFileToApi = async (file: File): Promise<string> => {
+    const { data: { session } } = await supabase.auth.getSession();
+    let accessToken = session?.access_token;
+    if (!accessToken && typeof document !== 'undefined') {
+      const cookieMatch = document.cookie.match(/sb-access-token=([^;]+)/);
+      accessToken = cookieMatch?.[1];
+    }
+
+    if (!accessToken) {
+      throw new Error('Sesión no encontrada. Por favor vuelve a iniciar sesión.');
+    }
+
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('bucket', 'product-images');
+
+    const res = await fetch('/api/admin/upload', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${accessToken}`
+      },
+      body: formData
+    });
+
+    const data = await res.json();
+    if (!res.ok) {
+      throw new Error(data.error || 'Error al subir la imagen.');
+    }
+
+    return data.url;
+  };
 
   // Fetch product data if in edit mode
   useEffect(() => {
@@ -80,6 +123,17 @@ export default function ProductForm({ productId }: ProductFormProps) {
           setLargo(data.largo || '');
           setCintura(data.cintura || '');
           setPanos(data.panos || '');
+
+          // Custom panel prices
+          if (data.precios_panos && typeof data.precios_panos === 'object') {
+            setPreciosPanos({
+              '6': data.precios_panos['6'] ?? '',
+              '8': data.precios_panos['8'] ?? '',
+              '10': data.precios_panos['10'] ?? '',
+              '12': data.precios_panos['12'] ?? '',
+              '14': data.precios_panos['14'] ?? ''
+            });
+          }
         }
       } catch (err: any) {
         console.error('Error fetching product:', err);
@@ -116,6 +170,14 @@ export default function ProductForm({ productId }: ProductFormProps) {
       return;
     }
 
+    // Clean precios_panos
+    const cleanedPreciosPanos: Record<string, number> = {};
+    Object.entries(preciosPanos).forEach(([key, val]) => {
+      if (val !== '' && val !== null && !isNaN(Number(val)) && Number(val) > 0) {
+        cleanedPreciosPanos[key] = Number(val);
+      }
+    });
+
     const productPayload = {
       name,
       category,
@@ -130,7 +192,8 @@ export default function ProductForm({ productId }: ProductFormProps) {
       talla: talla || null,
       largo: largo ? Number(largo) : null,
       cintura: cintura ? Number(cintura) : null,
-      panos: panos ? Number(panos) : null
+      panos: panos ? Number(panos) : null,
+      precios_panos: Object.keys(cleanedPreciosPanos).length > 0 ? cleanedPreciosPanos : null
     };
 
     try {
@@ -410,19 +473,55 @@ export default function ProductForm({ productId }: ProductFormProps) {
 
                   {/* Pleats / Panos */}
                   <div className="flex flex-col gap-2">
-                    <label className="text-sm font-semibold text-on-surface">Paños y Volumen</label>
+                    <label className="text-sm font-semibold text-on-surface">Paños base de la prenda</label>
                     <div className="relative">
                       <select
                         className="w-full h-11 px-4 rounded-xl bg-surface-container-lowest border border-outline-variant/50 focus:border-primary focus:ring-4 focus:ring-primary/5 appearance-none transition-all text-sm text-on-surface"
                         value={panos || ''}
                         onChange={(e) => setPanos(Number(e.target.value))}
                       >
-                        <option value="">Seleccionar pliegues</option>
+                        <option value="">Seleccionar pliegues base</option>
                         <option value="6">6 Paños</option>
                         <option value="8">8 Paños</option>
                         <option value="10">10 Paños</option>
+                        <option value="12">12 Paños</option>
+                        <option value="14">14 Paños</option>
                       </select>
                       <ChevronDown className="w-5 h-5 absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant" />
+                    </div>
+                  </div>
+
+                  {/* Tabla de Precios por Paño Personalizados */}
+                  <div className="md:col-span-2 bg-surface-container-low/40 p-4 sm:p-5 rounded-2xl border border-outline-variant/20 space-y-3">
+                    <div className="flex items-center gap-2">
+                      <Coins className="w-5 h-5 text-primary" />
+                      <div>
+                        <h4 className="font-bold text-sm text-on-surface">Tabla de Precios por Cantidad de Paños (Bs.)</h4>
+                        <p className="text-xs text-on-surface-variant">Establece el precio exacto según el volumen de la prenda. Si se deja en blanco, se calculará proporcionalmente.</p>
+                      </div>
+                    </div>
+                    
+                    <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 pt-2">
+                      {['6', '8', '10', '12', '14'].map((numPanos) => (
+                        <div key={numPanos} className="flex flex-col gap-1">
+                          <label className="text-[11px] font-extrabold uppercase tracking-wider text-on-surface-variant">
+                            {numPanos} Paños
+                          </label>
+                          <div className="relative">
+                            <input
+                              type="number"
+                              placeholder={`ej. ${Number(price || 1000) * (Number(numPanos)/10)}`}
+                              value={preciosPanos[numPanos] ?? ''}
+                              onChange={(e) => setPreciosPanos({
+                                ...preciosPanos,
+                                [numPanos]: e.target.value ? Number(e.target.value) : ''
+                              })}
+                              className="w-full h-10 px-3 pr-8 rounded-xl bg-white border border-outline-variant/40 text-sm font-bold text-on-surface focus:border-primary focus:outline-none"
+                            />
+                            <span className="absolute right-2 top-1/2 -translate-y-1/2 text-xs font-bold text-on-surface-variant/50">Bs</span>
+                          </div>
+                        </div>
+                      ))}
                     </div>
                   </div>
                 </>
@@ -474,17 +573,50 @@ export default function ProductForm({ productId }: ProductFormProps) {
             </div>
 
             <div className="space-y-4">
-              {/* Primary Image URL */}
+              {/* Primary Image URL & File Upload */}
               <div className="flex flex-col gap-2">
-                <label className="text-sm font-semibold text-on-surface">URL de Imagen Principal <span className="text-primary">*</span></label>
-                <input
-                  className="w-full h-11 px-4 rounded-xl bg-surface-container-lowest border border-outline-variant/50 focus:border-primary text-sm"
-                  placeholder="https://ejemplo.com/imagen.jpg"
-                  type="text"
-                  value={imageUrl}
-                  onChange={(e) => setImageUrl(e.target.value)}
-                  required
-                />
+                <label className="text-sm font-semibold text-on-surface">Imagen Principal <span className="text-primary">*</span></label>
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <input
+                    className="flex-1 h-11 px-4 rounded-xl bg-surface-container-lowest border border-outline-variant/50 focus:border-primary text-sm"
+                    placeholder="https://ejemplo.com/imagen.jpg o sube un archivo..."
+                    type="text"
+                    value={imageUrl}
+                    onChange={(e) => setImageUrl(e.target.value)}
+                    required
+                  />
+                  <label className={`px-4 py-2.5 bg-primary/10 text-primary border border-primary/20 rounded-xl text-xs font-bold hover:bg-primary/20 transition-all flex items-center justify-center gap-2 cursor-pointer shrink-0 ${uploadingMain ? 'opacity-50 pointer-events-none' : ''}`}>
+                    {uploadingMain ? (
+                      <>
+                        <span className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin"></span>
+                        Subiendo...
+                      </>
+                    ) : (
+                      <>
+                        <ImageIcon className="w-4 h-4" />
+                        Subir Archivo
+                      </>
+                    )}
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={async (e) => {
+                        const file = e.target.files?.[0];
+                        if (!file) return;
+                        try {
+                          setUploadingMain(true);
+                          const url = await uploadFileToApi(file);
+                          setImageUrl(url);
+                        } catch (err: any) {
+                          alert(err.message || 'Error al subir imagen principal.');
+                        } finally {
+                          setUploadingMain(false);
+                        }
+                      }}
+                    />
+                  </label>
+                </div>
               </div>
 
               {/* Grid of images preview */}
@@ -501,15 +633,43 @@ export default function ProductForm({ productId }: ProductFormProps) {
                       value={newImageUrl}
                       onChange={(e) => setNewImageUrl(e.target.value)}
                     />
-                    <button
-                      type="button"
-                      onClick={handleAddImage}
-                      disabled={images.length >= 4}
-                      className="w-full py-2.5 bg-primary/10 text-primary border border-primary/20 rounded-xl text-xs font-bold hover:bg-primary/15 transition-all flex items-center justify-center gap-1 cursor-pointer disabled:opacity-50 font-semibold"
-                    >
-                      <Plus className="w-4 h-4" />
-                      Añadir a Galería
-                    </button>
+                    <div className="flex gap-2">
+                      <button
+                        type="button"
+                        onClick={handleAddImage}
+                        disabled={images.length >= 4 || !newImageUrl.trim()}
+                        className="flex-1 py-2.5 bg-surface-container-high text-on-surface rounded-xl text-xs font-bold hover:bg-surface-container-highest transition-all flex items-center justify-center gap-1 cursor-pointer disabled:opacity-50"
+                      >
+                        <Plus className="w-4 h-4" />
+                        Añadir URL
+                      </button>
+                      <label className={`flex-1 py-2.5 bg-primary/10 text-primary border border-primary/20 rounded-xl text-xs font-bold hover:bg-primary/20 transition-all flex items-center justify-center gap-1 cursor-pointer ${uploadingGallery || images.length >= 4 ? 'opacity-50 pointer-events-none' : ''}`}>
+                        {uploadingGallery ? (
+                          <span className="w-3 h-3 border-2 border-primary border-t-transparent rounded-full animate-spin"></span>
+                        ) : (
+                          <ImageIcon className="w-3.5 h-3.5" />
+                        )}
+                        Subir Archivo
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={async (e) => {
+                            const file = e.target.files?.[0];
+                            if (!file) return;
+                            try {
+                              setUploadingGallery(true);
+                              const url = await uploadFileToApi(file);
+                              setImages([...images, url]);
+                            } catch (err: any) {
+                              alert(err.message || 'Error al subir imagen a la galería.');
+                            } finally {
+                              setUploadingGallery(false);
+                            }
+                          }}
+                        />
+                      </label>
+                    </div>
                   </div>
                 </div>
 

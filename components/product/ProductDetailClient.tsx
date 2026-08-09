@@ -108,8 +108,18 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
   const isJacket = product.category === 'Chaquetas';
   const isAccessory = product.category === 'Accesorios' || product.category === 'Textiles';
 
+  // Helper to lookup custom panel price or calculate fallback
+  const getPriceForPanels = (panels: number) => {
+    const customPrices = product.precios_panos as Record<string, number> | null | undefined;
+    const panelKey = String(panels);
+    if (customPrices && typeof customPrices === 'object' && customPrices[panelKey] != null) {
+      return Number(customPrices[panelKey]);
+    }
+    return Math.round((product.price / basePanels) * panels);
+  };
+
   const currentPrice = (isPollera && isCustomizable)
-    ? Math.round((product.price / basePanels) * selectedPanels)
+    ? getPriceForPanels(selectedPanels)
     : product.price;
 
   // Helper to get estimated delivery date for Polleras (15-20 days from now)
@@ -403,11 +413,11 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                       onChange={(e) => setSelectedPanels(Number(e.target.value))}
                       className="w-full bg-surface border border-outline-variant rounded-lg py-3 px-4 pr-10 font-body-md font-semibold text-on-surface focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all cursor-pointer appearance-none"
                     >
-                      <option value="6">6 paños ({formatCurrency(Math.round((product.price / basePanels) * 6))})</option>
-                      <option value="8">8 paños ({formatCurrency(Math.round((product.price / basePanels) * 8))})</option>
-                      <option value="10">10 paños ({formatCurrency(Math.round((product.price / basePanels) * 10))})</option>
-                      <option value="12">12 paños ({formatCurrency(Math.round((product.price / basePanels) * 12))})</option>
-                      <option value="14">14 paños ({formatCurrency(Math.round((product.price / basePanels) * 14))})</option>
+                      <option value="6">6 paños ({formatCurrency(getPriceForPanels(6))})</option>
+                      <option value="8">8 paños ({formatCurrency(getPriceForPanels(8))})</option>
+                      <option value="10">10 paños ({formatCurrency(getPriceForPanels(10))})</option>
+                      <option value="12">12 paños ({formatCurrency(getPriceForPanels(12))})</option>
+                      <option value="14">14 paños ({formatCurrency(getPriceForPanels(14))})</option>
                     </select>
                     <ChevronDown className="w-5 h-5 absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant" />
                   </div>

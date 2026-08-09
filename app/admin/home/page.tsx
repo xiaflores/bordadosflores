@@ -84,45 +84,49 @@ export default function AdminHomePage() {
     setIsSlideModalOpen(true);
   };
 
-  // Upload image to Supabase storage
+  // Upload image via secure server API
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
     try {
       setUploadingImage(true);
-      const fileExt = file.name.split('.').pop();
-      const fileName = `hero_${Date.now()}.${fileExt}`;
 
-      // Upload file to product-images or avatars bucket
-      const { error: uploadError } = await supabase.storage
-        .from('product-images')
-        .upload(fileName, file, { cacheControl: '3600', upsert: true });
-
-      if (uploadError) {
-        // Fallback to avatars bucket if product-images doesn't exist
-        const { error: avatarUploadErr } = await supabase.storage
-          .from('avatars')
-          .upload(fileName, file, { cacheControl: '3600', upsert: true });
-        
-        if (avatarUploadErr) throw avatarUploadErr;
-
-        const { data: { publicUrl } } = supabase.storage
-          .from('avatars')
-          .getPublicUrl(fileName);
-        setSlideImageUrl(publicUrl);
-      } else {
-        const { data: { publicUrl } } = supabase.storage
-          .from('product-images')
-          .getPublicUrl(fileName);
-        setSlideImageUrl(publicUrl);
+      const { data: { session } } = await supabase.auth.getSession();
+      let accessToken = session?.access_token;
+      if (!accessToken && typeof document !== 'undefined') {
+        const cookieMatch = document.cookie.match(/sb-access-token=([^;]+)/);
+        accessToken = cookieMatch?.[1];
       }
 
+      if (!accessToken) {
+        throw new Error('Sesión no encontrada. Por favor vuelve a iniciar sesión.');
+      }
+
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('bucket', 'product-images');
+
+      const response = await fetch('/api/admin/upload', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${accessToken}`
+        },
+        body: formData
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Error al subir la imagen.');
+      }
+
+      setSlideImageUrl(result.url);
       setImageError(false);
       triggerToast('Imagen subida correctamente');
     } catch (err: any) {
       console.error('Error subiendo imagen:', err);
-      alert('No se pudo subir la imagen. Por favor pega una URL de imagen o intenta de nuevo.');
+      alert(err.message || 'No se pudo subir la imagen. Intenta de nuevo.');
     } finally {
       setUploadingImage(false);
     }
