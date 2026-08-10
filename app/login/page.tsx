@@ -934,14 +934,6 @@ export default function LoginPage() {
         {/* Form Side */}
         <main className="flex-grow flex items-center justify-center pb-12 px-margin-mobile py-12 lg:w-2/3">
           <div className="max-w-md w-full bg-white p-8 rounded-xl soft-elevation border border-surface-variant/30">
-            
-            {/* Back Home Link */}
-            <div className="mb-4">
-              <Link href="/" className="inline-flex items-center gap-1 text-primary hover:opacity-80 font-bold transition-all text-body-sm">
-                <ArrowLeft className="w-4 h-4" />
-                Volver al inicio
-              </Link>
-            </div>
 
             {/* Branding/Heading */}
             <div className="text-center mb-8">
@@ -949,7 +941,7 @@ export default function LoginPage() {
                 {isSignUp ? 'Únete a Bordados Flores' : 'Inicia sesión'}
               </h1>
               <p className="font-body-md text-on-surface-variant">
-                {isSignUp ? 'Vive el lujo de la auténtica artesanía boliviana.' : 'Descubre piezas textiles exclusivas con historia.'}
+                {isSignUp ? 'Vive el lujo de la auténtica artesanía boliviana.' : 'Descubre piezas textiles exclusivas.'}
               </p>
             </div>
 
@@ -995,7 +987,7 @@ export default function LoginPage() {
                 <input
                   className="w-full bg-[#f5f5f5] border-t-0 border-x-0 border-b-2 border-outline-variant py-3 px-4 transition-colors focus:ring-0 focus:border-primary focus:outline-none text-sm"
                   id="email"
-                  placeholder="elena@herencia.com"
+                  placeholder="usuario@gmail.com"
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -1063,7 +1055,7 @@ export default function LoginPage() {
             </div>
 
             {/* Social Auth */}
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4">
               <button
                 onClick={() => handleOAuthSignIn('google')}
                 disabled={loading}
@@ -1076,17 +1068,6 @@ export default function LoginPage() {
                   <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 12-4.53z" fill="#EA4335"></path>
                 </svg>
                 <span className="font-body-sm text-on-surface">Google</span>
-              </button>
-              
-              <button
-                onClick={() => handleOAuthSignIn('facebook')}
-                disabled={loading}
-                className="flex items-center justify-center gap-2 border-2 border-outline-variant py-3 rounded-xl hover:bg-surface-container-low transition-colors active:scale-95 cursor-pointer disabled:opacity-50"
-              >
-                <svg className="w-5 h-5 fill-[#1877F2]" viewBox="0 0 24 24">
-                  <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"></path>
-                </svg>
-                <span className="font-body-sm text-on-surface">Facebook</span>
               </button>
             </div>
 

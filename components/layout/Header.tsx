@@ -125,9 +125,6 @@ export default function Header() {
           </nav>
 
           <div className="flex items-center gap-1 md:gap-2">
-            <button className="p-2 rounded-full active:scale-95 text-primary hover:bg-surface-container transition-all flex items-center justify-center">
-              <Search className="w-5 h-5" />
-            </button>
             <Link
               href="/cesta"
               className="p-2 rounded-full relative active:scale-95 text-primary hover:bg-surface-container transition-all flex items-center justify-center"

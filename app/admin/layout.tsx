@@ -235,14 +235,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           </Link>
 
           <Link
-            href="#"
-            className="flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-primary transition-all"
-          >
-            <ClipboardList className="w-5 h-5 shrink-0" />
-            {!sidebarCollapsed && <span className="font-beVietnamPro text-body-md">Inventario</span>}
-          </Link>
-
-          <Link
             href="/admin/pedidos"
             className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
               pathname.startsWith('/admin/pedidos')
