@@ -1,16 +1,30 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { HeroSlide, getStoredHeroSlides } from '@/lib/homeContent';
+import { HeroSlide, getStoredHeroSlides, saveStoredHeroSlides } from '@/lib/homeContent';
 
 export default function HeroSlider() {
   const [slides, setSlides] = useState<HeroSlide[]>([]);
   const [currentSlide, setCurrentSlide] = useState(0);
   const sliderIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  const loadSlides = () => {
-    const loaded = getStoredHeroSlides();
-    setSlides(loaded);
+  const loadSlides = async () => {
+    // 1. Initial fallback to localStorage / defaults
+    setSlides(getStoredHeroSlides());
+
+    // 2. Fetch fresh global slides from Supabase DB API
+    try {
+      const res = await fetch('/api/admin/home-config');
+      if (res.ok) {
+        const data = await res.json();
+        if (data.slides && Array.isArray(data.slides) && data.slides.length > 0) {
+          setSlides(data.slides);
+          saveStoredHeroSlides(data.slides);
+        }
+      }
+    } catch (err) {
+      console.error('Error fetching hero slides from API:', err);
+    }
   };
 
   useEffect(() => {

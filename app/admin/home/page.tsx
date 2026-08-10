@@ -50,9 +50,59 @@ export default function AdminHomePage() {
   // Success Feedback Toast
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
+  // Persist slides & texts globally to Supabase DB
+  const persistGlobalConfig = async (updatedSlides: HeroSlide[], updatedTexts: HomeTexts) => {
+    setSlides(updatedSlides);
+    setHomeTexts(updatedTexts);
+    saveStoredHeroSlides(updatedSlides);
+    saveStoredHomeTexts(updatedTexts);
+
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      let accessToken = session?.access_token;
+      if (!accessToken && typeof document !== 'undefined') {
+        const cookieMatch = document.cookie.match(/sb-access-token=([^;]+)/);
+        accessToken = cookieMatch?.[1];
+      }
+
+      if (accessToken) {
+        await fetch('/api/admin/home-config', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${accessToken}`
+          },
+          body: JSON.stringify({ slides: updatedSlides, texts: updatedTexts })
+        });
+      }
+    } catch (err) {
+      console.error('Error saving home config to Supabase DB:', err);
+    }
+  };
+
   useEffect(() => {
-    setSlides(getStoredHeroSlides());
-    setHomeTexts(getStoredHomeTexts());
+    const fetchGlobalConfig = async () => {
+      setSlides(getStoredHeroSlides());
+      setHomeTexts(getStoredHomeTexts());
+
+      try {
+        const res = await fetch('/api/admin/home-config');
+        if (res.ok) {
+          const data = await res.json();
+          if (data.slides && Array.isArray(data.slides) && data.slides.length > 0) {
+            setSlides(data.slides);
+            saveStoredHeroSlides(data.slides);
+          }
+          if (data.texts) {
+            setHomeTexts(data.texts);
+            saveStoredHomeTexts(data.texts);
+          }
+        }
+      } catch (err) {
+        console.error('Error fetching initial home config:', err);
+      }
+    };
+    fetchGlobalConfig();
   }, []);
 
   const triggerToast = (msg: string) => {
@@ -140,9 +190,10 @@ export default function AdminHomePage() {
       return;
     }
 
+    let updated: HeroSlide[];
     if (editingSlideId) {
       // Update existing
-      const updated = slides.map(s => s.id === editingSlideId ? {
+      updated = slides.map(s => s.id === editingSlideId ? {
         id: editingSlideId,
         title: slideTitle,
         tag: slideTag,
@@ -150,8 +201,6 @@ export default function AdminHomePage() {
         link: slideLink,
         imageUrl: slideImageUrl
       } : s);
-      setSlides(updated);
-      saveStoredHeroSlides(updated);
       triggerToast('Banner actualizado correctamente');
     } else {
       // Create new
@@ -163,12 +212,11 @@ export default function AdminHomePage() {
         link: slideLink || '/catalogo',
         imageUrl: slideImageUrl
       };
-      const updated = [...slides, newSlide];
-      setSlides(updated);
-      saveStoredHeroSlides(updated);
+      updated = [...slides, newSlide];
       triggerToast('Nuevo banner agregado con éxito');
     }
 
+    persistGlobalConfig(updated, homeTexts);
     setIsSlideModalOpen(false);
   };
 
@@ -180,8 +228,7 @@ export default function AdminHomePage() {
     }
     if (confirm('¿Estás seguro de eliminar este banner del inicio?')) {
       const updated = slides.filter(s => s.id !== id);
-      setSlides(updated);
-      saveStoredHeroSlides(updated);
+      persistGlobalConfig(updated, homeTexts);
       triggerToast('Banner eliminado');
     }
   };
@@ -193,8 +240,7 @@ export default function AdminHomePage() {
     const temp = newSlides[index - 1];
     newSlides[index - 1] = newSlides[index];
     newSlides[index] = temp;
-    setSlides(newSlides);
-    saveStoredHeroSlides(newSlides);
+    persistGlobalConfig(newSlides, homeTexts);
     triggerToast('Orden actualizado');
   };
 
@@ -205,25 +251,21 @@ export default function AdminHomePage() {
     const temp = newSlides[index + 1];
     newSlides[index + 1] = newSlides[index];
     newSlides[index] = temp;
-    setSlides(newSlides);
-    saveStoredHeroSlides(newSlides);
+    persistGlobalConfig(newSlides, homeTexts);
     triggerToast('Orden actualizado');
   };
 
   // Save Home Texts
   const handleSaveTexts = (e: React.FormEvent) => {
     e.preventDefault();
-    saveStoredHomeTexts(homeTexts);
+    persistGlobalConfig(slides, homeTexts);
     triggerToast('Textos e información del Home guardados');
   };
 
   // Reset to Defaults
   const handleResetDefaults = () => {
     if (confirm('¿Deseas restaurar los banners y textos por defecto del inicio?')) {
-      setSlides(DEFAULT_HERO_SLIDES);
-      setHomeTexts(DEFAULT_HOME_TEXTS);
-      saveStoredHeroSlides(DEFAULT_HERO_SLIDES);
-      saveStoredHomeTexts(DEFAULT_HOME_TEXTS);
+      persistGlobalConfig(DEFAULT_HERO_SLIDES, DEFAULT_HOME_TEXTS);
       triggerToast('Contenido restaurado por defecto');
     }
   };

@@ -1,20 +1,36 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { HomeTexts, DEFAULT_HOME_TEXTS, getStoredHomeTexts } from '@/lib/homeContent';
+import { HomeTexts, DEFAULT_HOME_TEXTS, getStoredHomeTexts, saveStoredHomeTexts } from '@/lib/homeContent';
 
 export default function HomeSocialAndHeader() {
   const [texts, setTexts] = useState<HomeTexts>(DEFAULT_HOME_TEXTS);
   const [mounted, setMounted] = useState(false);
 
-  useEffect(() => {
-    // Load from localStorage only on the client after mount
+  const loadTexts = async () => {
+    // 1. Initial fallback to localStorage / defaults
     setTexts(getStoredHomeTexts());
     setMounted(true);
 
-    const handleUpdate = () => {
-      setTexts(getStoredHomeTexts());
-    };
+    // 2. Fetch fresh global texts from Supabase DB API
+    try {
+      const res = await fetch('/api/admin/home-config');
+      if (res.ok) {
+        const data = await res.json();
+        if (data.texts) {
+          const merged = { ...DEFAULT_HOME_TEXTS, ...data.texts };
+          setTexts(merged);
+          saveStoredHomeTexts(merged);
+        }
+      }
+    } catch (err) {
+      console.error('Error fetching home texts from API:', err);
+    }
+  };
+
+  useEffect(() => {
+    loadTexts();
+    const handleUpdate = () => loadTexts();
     window.addEventListener('bordados_flores_texts_updated', handleUpdate);
     return () => window.removeEventListener('bordados_flores_texts_updated', handleUpdate);
   }, []);
