@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Header from '@/components/layout/Header';
 import BottomNav from '@/components/layout/BottomNav';
 import { Product } from '@/types/product';
@@ -33,7 +33,9 @@ interface ProductDetailClientProps {
 
 export default function ProductDetailClient({ product }: ProductDetailClientProps) {
   const { addToCart } = useCart();
-  const images = product.images && product.images.length > 0 ? product.images : [product.imageUrl];
+  const images = Array.from(
+    new Set([product.imageUrl, ...(product.images || [])])
+  ).filter((img): img is string => Boolean(img && img.trim()));
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [isFavorite, setIsFavorite] = useState(false);
   const [shippingDestination, setShippingDestination] = useState('or');
@@ -151,11 +153,35 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
     return `${minDate.toLocaleDateString('es-ES', options)} - ${maxDate.toLocaleDateString('es-ES', options)}`;
   };
 
+  // Automatic slide transitions for product detail carousel
+  const autoSlideIntervalRef = useRef<NodeJS.Timeout | null>(null);
+
+  const startAutoSlide = () => {
+    stopAutoSlide();
+    if (images.length <= 1) return;
+    autoSlideIntervalRef.current = setInterval(() => {
+      setActiveImageIndex((prev) => (prev + 1) % images.length);
+    }, 4000);
+  };
+
+  const stopAutoSlide = () => {
+    if (autoSlideIntervalRef.current) {
+      clearInterval(autoSlideIntervalRef.current);
+    }
+  };
+
+  useEffect(() => {
+    startAutoSlide();
+    return () => stopAutoSlide();
+  }, [images.length]);
+
   const handleNextImage = () => {
+    startAutoSlide();
     setActiveImageIndex((prev) => (prev + 1) % images.length);
   };
 
   const handlePrevImage = () => {
+    startAutoSlide();
     setActiveImageIndex((prev) => (prev - 1 + images.length) % images.length);
   };
 
@@ -281,7 +307,11 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
         
         {/* Left Column: Image Section with Carousel & Thumbnails */}
         <div className="lg:w-3/5 w-full space-y-6">
-          <div className="relative aspect-square w-full overflow-hidden rounded-xl bg-surface-container-low shadow-[0px_4px_20px_rgba(0,0,0,0.04)]">
+          <div 
+            className="relative aspect-square w-full overflow-hidden rounded-xl bg-surface-container-low shadow-[0px_4px_20px_rgba(0,0,0,0.04)]"
+            onMouseEnter={stopAutoSlide}
+            onMouseLeave={startAutoSlide}
+          >
             <img
               alt={`${product.name} - Vista ${activeImageIndex + 1}`}
               className="w-full h-full object-cover transition-all duration-500"

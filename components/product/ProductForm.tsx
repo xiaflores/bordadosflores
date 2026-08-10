@@ -114,8 +114,14 @@ export default function ProductForm({ productId }: ProductFormProps) {
           setPrice(Number(data.price) || 0);
           setAvailability(data.availability || 'En Stock');
           setDescription(data.description || '');
-          setImageUrl(data.imageUrl || '');
-          setImages(data.images || []);
+          const mainImg = data.imageUrl || '';
+          setImageUrl(mainImg);
+
+          // Deduplicate secondary images so mainImg is not repeated in gallery
+          const secondaryImages = (data.images || []).filter(
+            (img: string) => img && img.trim() !== mainImg.trim()
+          );
+          setImages(secondaryImages);
           
           // Spec attributes
           setColorName(data.color_name || '');
@@ -191,6 +197,11 @@ export default function ProductForm({ productId }: ProductFormProps) {
       finalTags.push(`PRECIOS_PANOS:${JSON.stringify(cleanedPreciosPanos)}`);
     }
 
+    // Clean secondary gallery images to ensure main imageUrl is not duplicated
+    const cleanedGalleryImages = (images || []).filter(
+      img => img && img.trim() !== '' && img.trim() !== imageUrl.trim()
+    );
+
     const productPayload = {
       name,
       category,
@@ -198,7 +209,7 @@ export default function ProductForm({ productId }: ProductFormProps) {
       availability,
       imageUrl,
       description,
-      images,
+      images: cleanedGalleryImages,
       tags: finalTags,
       // Spec attributes
       color_name: colorName || null,
