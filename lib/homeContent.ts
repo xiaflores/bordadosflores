@@ -17,6 +17,7 @@ export interface HomeTexts {
   socialInstagram: string;
   socialFacebook: string;
   socialWhatsapp: string;
+  minDeliveryDate?: string;
 }
 
 export const DEFAULT_HERO_SLIDES: HeroSlide[] = [

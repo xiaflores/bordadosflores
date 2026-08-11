@@ -90,20 +90,42 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
   const sizeOptions = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
   const [jacketDeliveryDate, setJacketDeliveryDate] = useState('');
 
+  // Admin Delivery Agenda Limitation
+  const [adminMinDeliveryDate, setAdminMinDeliveryDate] = useState<string | null>(null);
+
   useEffect(() => {
-    // Set default date to 15 days from now
-    const minDate = new Date();
-    minDate.setDate(minDate.getDate() + 15);
-    const minDateStr = minDate.toISOString().split('T')[0];
-    setJacketDeliveryDate(minDateStr);
-    setPolleraDeliveryDate(minDateStr);
+    const fetchAgendaLimit = async () => {
+      try {
+        const res = await fetch('/api/admin/home-config');
+        if (res.ok) {
+          const data = await res.json();
+          if (data.texts?.minDeliveryDate) {
+            setAdminMinDeliveryDate(data.texts.minDeliveryDate);
+          }
+        }
+      } catch (e) {
+        console.error('Error fetching admin delivery date limit:', e);
+      }
+    };
+    fetchAgendaLimit();
   }, []);
 
   const getMinDeliveryDateString = () => {
-    const minDate = new Date();
-    minDate.setDate(minDate.getDate() + 15);
-    return minDate.toISOString().split('T')[0];
+    const standardMin = new Date();
+    standardMin.setDate(standardMin.getDate() + 15);
+    const standardMinStr = standardMin.toISOString().split('T')[0];
+
+    if (adminMinDeliveryDate && adminMinDeliveryDate > standardMinStr) {
+      return adminMinDeliveryDate;
+    }
+    return standardMinStr;
   };
+
+  useEffect(() => {
+    const minDateStr = getMinDeliveryDateString();
+    setJacketDeliveryDate(minDateStr);
+    setPolleraDeliveryDate(minDateStr);
+  }, [adminMinDeliveryDate]);
 
   // Calculate dynamic price based on panels (only for Polleras A Pedido)
   const isPollera = product.category === 'Polleras';
@@ -526,11 +548,17 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
 
                 {/* Delivery Warning Box */}
                 <div className="flex gap-3.5 p-4.5 bg-primary/5 rounded-lg border border-primary/20">
-                  <Calendar className="w-5 h-5 text-primary" />
+                  <Calendar className="w-5 h-5 text-primary shrink-0" />
                   <div>
-                    <p className="font-bold text-primary text-body-sm">Tiempo de confección: 15-20 días</p>
-                    <p className="text-on-surface-variant text-[11px]">
-                      Esta pieza se fabrica de forma artesanal y personalizada por maestros tejedores.
+                    <p className="font-bold text-primary text-body-sm">
+                      {adminMinDeliveryDate && adminMinDeliveryDate > new Date().toISOString().split('T')[0]
+                        ? `Agenda llena. Entregas disponibles a partir del ${new Date(adminMinDeliveryDate + 'T00:00:00').toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' })}`
+                        : 'Tiempo de confección artesanal: 15-20 días'}
+                    </p>
+                    <p className="text-on-surface-variant text-[11px] mt-0.5">
+                      {adminMinDeliveryDate && adminMinDeliveryDate > new Date().toISOString().split('T')[0]
+                        ? 'Debido al alto volumen de pedidos, las fechas anteriores se encuentran totalmente reservadas.'
+                        : 'Esta pieza se fabrica de forma artesanal y personalizada por maestros tejedores.'}
                     </p>
                   </div>
                 </div>
@@ -699,9 +727,15 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                 <div className="flex gap-4 p-5 bg-primary/5 rounded-xl border border-primary/20">
                   <Info className="w-5 h-5 text-primary shrink-0" />
                   <div className="flex flex-col gap-1">
-                    <p className="font-bold text-primary text-body-md">Tiempo de confección: 15-20 días</p>
+                    <p className="font-bold text-primary text-body-md">
+                      {adminMinDeliveryDate && adminMinDeliveryDate > new Date().toISOString().split('T')[0]
+                        ? `Agenda llena. Entregas disponibles a partir del ${new Date(adminMinDeliveryDate + 'T00:00:00').toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' })}`
+                        : 'Tiempo de confección artesanal: 15-20 días'}
+                    </p>
                     <p className="font-body-sm text-on-surface-variant leading-relaxed">
-                      Mínimo 15 días a partir de hoy. La fecha de entrega está limitada conforme al proceso de fabricación artesanal a medida.
+                      {adminMinDeliveryDate && adminMinDeliveryDate > new Date().toISOString().split('T')[0]
+                        ? 'Las fechas anteriores se encuentran bloqueadas por reserva previa de pedidos.'
+                        : 'Mínimo 15 días a partir de hoy. La fecha de entrega está limitada conforme al proceso de fabricación artesanal a medida.'}
                     </p>
                   </div>
                 </div>

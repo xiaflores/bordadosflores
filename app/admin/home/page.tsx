@@ -29,7 +29,8 @@ import {
   Share2, 
   MessageSquare, 
   FileText,
-  Eye
+  Eye,
+  Calendar
 } from 'lucide-react';
 
 export default function AdminHomePage() {
@@ -472,6 +473,36 @@ export default function AdminHomePage() {
                 placeholder="Ej. Selección exclusiva bordada a mano"
                 className="w-full bg-surface-container-lowest border border-outline-variant rounded-xl p-3.5 font-body-md text-on-surface focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all"
               />
+            </div>
+
+            {/* Delivery Date Limit / Agenda Control */}
+            <div className="space-y-2 md:col-span-2 pt-4 border-t border-outline-variant/20">
+              <div className="flex items-center gap-2">
+                <Calendar className="w-5 h-5 text-primary" />
+                <label className="font-label-md text-xs font-bold text-on-surface uppercase tracking-wider block">
+                  Fecha Mínima de Entrega de Pedidos (Control de Agenda)
+                </label>
+              </div>
+              <p className="text-xs text-on-surface-variant">
+                Establece la fecha límite a partir de la cual los clientes podrán solicitar la entrega de sus prendas a pedido. Utilízalo cuando tengas la agenda llena (ej. hasta finales de septiembre) para evitar acumulación de trabajo.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
+                <input
+                  type="date"
+                  value={homeTexts.minDeliveryDate || ''}
+                  onChange={(e) => setHomeTexts({ ...homeTexts, minDeliveryDate: e.target.value })}
+                  className="w-full sm:w-72 bg-surface-container-lowest border border-outline-variant rounded-xl p-3.5 font-body-md text-on-surface focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all cursor-pointer font-bold"
+                />
+                {homeTexts.minDeliveryDate && (
+                  <button
+                    type="button"
+                    onClick={() => setHomeTexts({ ...homeTexts, minDeliveryDate: '' })}
+                    className="text-xs text-error font-bold hover:underline cursor-pointer"
+                  >
+                    Quitar Límite (Usar estándar 15 días)
+                  </button>
+                )}
+              </div>
             </div>
           </div>
         </section>
