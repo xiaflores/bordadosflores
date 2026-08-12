@@ -6,7 +6,7 @@ import Header from '@/components/layout/Header';
 import BottomNav from '@/components/layout/BottomNav';
 import { useCart } from '@/context/CartContext';
 import CartItemRow from '@/components/cart/CartItemRow';
-import { DEPARTAMENTOS } from '@/lib/constants';
+import { DEPARTAMENTOS, getDepartamentosWithCosts } from '@/lib/constants';
 import { supabase } from '@/lib/supabase';
 import { formatCurrency } from '@/lib/utils';
 import { 
@@ -25,6 +25,24 @@ export default function CestaPage() {
   const { cartItems, removeFromCart, updateQuantity, cartSubtotal, cartCount, isLoaded, clearCart } = useCart();
   const [selectedDeptId, setSelectedDeptId] = useState('or');
   const [customLocation, setCustomLocation] = useState('');
+  const [shippingCosts, setShippingCosts] = useState<Record<string, number> | null>(null);
+
+  useEffect(() => {
+    const fetchShippingCosts = async () => {
+      try {
+        const res = await fetch('/api/admin/home-config');
+        if (res.ok) {
+          const data = await res.json();
+          if (data.texts?.shippingCosts) {
+            setShippingCosts(data.texts.shippingCosts);
+          }
+        }
+      } catch (err) {
+        console.error('Error fetching shipping costs for cart:', err);
+      }
+    };
+    fetchShippingCosts();
+  }, []);
 
   // Set initial default department from localStorage if available
   useEffect(() => {
@@ -39,7 +57,8 @@ export default function CestaPage() {
     localStorage.setItem('bordados_flores_shipping_dept', deptId);
   };
 
-  const selectedDept = DEPARTAMENTOS.find(d => d.id === selectedDeptId) || DEPARTAMENTOS[0];
+  const departamentos = getDepartamentosWithCosts(shippingCosts);
+  const selectedDept = departamentos.find(d => d.id === selectedDeptId) || departamentos[0];
   const total = cartSubtotal + selectedDept.costo;
 
   const handleCheckout = async () => {
@@ -289,7 +308,7 @@ export default function CestaPage() {
                         onChange={(e) => handleDeptChange(e.target.value)}
                         className="w-full bg-surface border border-outline-variant rounded-xl py-3 px-4 pr-10 font-body-md font-semibold text-on-surface focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all cursor-pointer appearance-none text-sm"
                       >
-                        {DEPARTAMENTOS.map(dept => (
+                        {departamentos.map(dept => (
                           <option key={dept.id} value={dept.id}>
                             {dept.name} {dept.costo > 0 ? `(+ ${formatCurrency(dept.costo, true)})` : '(Gratis / Recojo)'}
                           </option>

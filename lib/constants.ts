@@ -29,3 +29,13 @@ export const DESTINATION_LABELS: Record<string, string> = {
   pn: 'Pando',
   otro: 'Otro Lugar/Provincia'
 };
+
+export function getDepartamentosWithCosts(customCosts?: Record<string, number> | null): Department[] {
+  if (!customCosts) return DEPARTAMENTOS;
+  return DEPARTAMENTOS.map(dept => ({
+    ...dept,
+    costo: customCosts[dept.id] != null && !isNaN(Number(customCosts[dept.id]))
+      ? Number(customCosts[dept.id])
+      : dept.costo
+  }));
+}

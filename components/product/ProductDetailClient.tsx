@@ -5,7 +5,7 @@ import Header from '@/components/layout/Header';
 import BottomNav from '@/components/layout/BottomNav';
 import { Product } from '@/types/product';
 import { useCart } from '@/context/CartContext';
-import { DEPARTAMENTOS, DESTINATION_LABELS } from '@/lib/constants';
+import { DEPARTAMENTOS, DESTINATION_LABELS, getDepartamentosWithCosts } from '@/lib/constants';
 import { formatCurrency } from '@/lib/utils';
 import { 
   Heart, 
@@ -90,11 +90,12 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
   const sizeOptions = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
   const [jacketDeliveryDate, setJacketDeliveryDate] = useState('');
 
-  // Admin Delivery Agenda Limitation
+  // Admin Delivery Agenda Limitation & Custom Shipping Costs
   const [adminMinDeliveryDate, setAdminMinDeliveryDate] = useState<string | null>(null);
+  const [shippingCosts, setShippingCosts] = useState<Record<string, number> | null>(null);
 
   useEffect(() => {
-    const fetchAgendaLimit = async () => {
+    const fetchGlobalConfig = async () => {
       try {
         const res = await fetch('/api/admin/home-config');
         if (res.ok) {
@@ -102,12 +103,15 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
           if (data.texts?.minDeliveryDate) {
             setAdminMinDeliveryDate(data.texts.minDeliveryDate);
           }
+          if (data.texts?.shippingCosts) {
+            setShippingCosts(data.texts.shippingCosts);
+          }
         }
       } catch (e) {
-        console.error('Error fetching admin delivery date limit:', e);
+        console.error('Error fetching admin global config in ProductDetailClient:', e);
       }
     };
-    fetchAgendaLimit();
+    fetchGlobalConfig();
   }, []);
 
   const getMinDeliveryDateString = () => {
@@ -861,9 +865,9 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                 onChange={(e) => setShippingDestination(e.target.value)}
                 className="w-full bg-surface-container-lowest border border-outline-variant rounded-xl py-3.5 px-5 pr-10 font-body-md font-semibold text-on-surface focus:outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all cursor-pointer appearance-none"
               >
-                {DEPARTAMENTOS.map((dept) => (
+                {getDepartamentosWithCosts(shippingCosts).map((dept) => (
                   <option key={dept.id} value={dept.id}>
-                    {dept.name}
+                    {dept.name} {dept.costo > 0 ? `(+ ${formatCurrency(dept.costo, true)})` : '(Gratis / Recojo)'}
                   </option>
                 ))}
               </select>

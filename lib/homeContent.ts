@@ -18,7 +18,21 @@ export interface HomeTexts {
   socialFacebook: string;
   socialWhatsapp: string;
   minDeliveryDate?: string;
+  shippingCosts?: Record<string, number>;
 }
+
+export const DEFAULT_SHIPPING_COSTS: Record<string, number> = {
+  or: 0,
+  lp: 15,
+  cb: 25,
+  sc: 25,
+  pt: 30,
+  ch: 30,
+  tj: 30,
+  bn: 40,
+  pn: 40,
+  otro: 35
+};
 
 export const DEFAULT_HERO_SLIDES: HeroSlide[] = [
   {
@@ -54,7 +68,8 @@ export const DEFAULT_HOME_TEXTS: HomeTexts = {
   socialTiktok: 'https://tiktok.com/@bordadodosflores',
   socialInstagram: 'https://instagram.com/bordadosflores1',
   socialFacebook: 'https://facebook.com/bordadosflores1',
-  socialWhatsapp: 'https://wa.me/59171182580'
+  socialWhatsapp: 'https://wa.me/59171182580',
+  shippingCosts: DEFAULT_SHIPPING_COSTS
 };
 
 const SLIDES_STORAGE_KEY = 'bordados_flores_hero_slides';

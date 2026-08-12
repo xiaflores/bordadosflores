@@ -10,8 +10,10 @@ import {
   getStoredHomeTexts, 
   saveStoredHomeTexts, 
   DEFAULT_HERO_SLIDES, 
-  DEFAULT_HOME_TEXTS 
+  DEFAULT_HOME_TEXTS,
+  DEFAULT_SHIPPING_COSTS
 } from '@/lib/homeContent';
+import { DEPARTAMENTOS } from '@/lib/constants';
 import { 
   Image as ImageIcon, 
   Plus, 
@@ -30,7 +32,8 @@ import {
   MessageSquare, 
   FileText,
   Eye,
-  Calendar
+  Calendar,
+  Truck
 } from 'lucide-react';
 
 export default function AdminHomePage() {
@@ -576,20 +579,65 @@ export default function AdminHomePage() {
               />
             </div>
           </div>
+        </section>
+
+        {/* 4. SHIPPING COSTS PER DEPARTMENT SECTION */}
+        <section className="bg-white p-6 lg:p-8 rounded-2xl border border-outline-variant/30 shadow-xs space-y-6">
+          <div className="border-b border-outline-variant/20 pb-4">
+            <h2 className="font-headline-sm text-xl font-bold text-on-surface flex items-center gap-2">
+              <Truck className="w-5 h-5 text-primary" />
+              Precios de Envío por Departamento (Bs)
+            </h2>
+            <p className="text-xs text-on-surface-variant mt-1">
+              Personaliza el costo del flete/envío para cada departamento de Bolivia. Los clientes verán estos precios al seleccionar su destino en la cesta.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+            {DEPARTAMENTOS.map((dept) => {
+              const currentCosts = homeTexts.shippingCosts || DEFAULT_SHIPPING_COSTS;
+              const costValue = currentCosts[dept.id] ?? dept.costo;
+
+              return (
+                <div key={dept.id} className="p-3.5 bg-surface-container-lowest border border-outline-variant/40 rounded-xl space-y-2">
+                  <label className="text-xs font-bold text-on-surface block truncate" title={dept.name}>
+                    {dept.name}
+                  </label>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="number"
+                      min="0"
+                      step="1"
+                      value={costValue}
+                      onChange={(e) => {
+                        const newCost = Math.max(0, Number(e.target.value) || 0);
+                        const updatedCosts = {
+                          ...DEFAULT_SHIPPING_COSTS,
+                          ...(homeTexts.shippingCosts || {}),
+                          [dept.id]: newCost
+                        };
+                        setHomeTexts({ ...homeTexts, shippingCosts: updatedCosts });
+                      }}
+                      className="w-full bg-white border border-outline-variant rounded-lg px-3 py-2 text-sm font-bold text-primary focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all"
+                    />
+                    <span className="text-xs font-bold text-on-surface-variant">Bs</span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
 
           <div className="flex justify-end pt-4 border-t border-outline-variant/20">
             <button
               type="submit"
-              className="px-8 py-3.5 bg-primary hover:bg-primary-container text-on-primary rounded-xl font-bold uppercase tracking-wider text-xs flex items-center gap-2 shadow-lg transition-all cursor-pointer active:scale-95"
+              className="px-6 py-3 bg-primary text-on-primary rounded-xl text-xs font-bold hover:bg-primary-hover transition-all shadow-md flex items-center gap-2 cursor-pointer active:scale-95"
             >
               <Save className="w-4 h-4" />
-              Guardar Cambios de Textos
+              Guardar Configuración y Precios de Envío
             </button>
           </div>
         </section>
       </form>
-
-      {/* SLIDE EDIT / CREATE MODAL */}
       {isSlideModalOpen && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto animate-fade-in">
           <div className="bg-white rounded-3xl max-w-xl w-full p-6 lg:p-8 shadow-2xl border border-outline-variant/30 space-y-6 my-8">
