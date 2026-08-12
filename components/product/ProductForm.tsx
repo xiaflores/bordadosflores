@@ -460,7 +460,7 @@ export default function ProductForm({ productId }: ProductFormProps) {
                   <div className="flex flex-col gap-2">
                     <label className="text-sm font-semibold text-on-surface">Largo (cm)</label>
                     <div className="flex gap-2">
-                      {[40, 45, 50, 55].map((lengthVal) => (
+                      {[35, 38, 40, 44, 50].map((lengthVal) => (
                         <button
                           key={lengthVal}
                           type="button"

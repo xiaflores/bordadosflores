@@ -512,8 +512,8 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                      >
                        <option value="35">35 cm (Mini/Pequeño)</option>
                        <option value="38">38 cm (Corto)</option>
-                       <option value="42">42 cm (Medio)</option>
-                       <option value="45">45 cm (Estándar)</option>
+                       <option value="40">40cm (Medio)</option>
+                       <option value="44">44 cm (Estándar)</option>
                        <option value="50">50 cm (Tradicional)</option>
                        <option value="otro">Otro (Especificar en cm)</option>
                      </select>
@@ -582,9 +582,6 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                     />
                     <Calendar className="w-5 h-5 absolute right-4 top-1/2 -translate-y-1/2 text-outline pointer-events-none group-focus-within:text-primary" />
                   </div>
-                  <p className="text-[11px] text-on-surface-variant/80 font-medium pt-1">
-                    Plazo mínimo sugerido de confección: <span className="font-bold text-primary">{getEstimatedDate()}</span>
-                  </p>
                 </div>
               </section>
             ) : (
