@@ -6,8 +6,11 @@ import ProductCard from '@/components/product/ProductCard';
 import { Product } from '@/types/product';
 import { supabase } from '@/lib/supabase';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export default async function Home() {
-  // Fetch only featured products (featured = true)
+  // Fetch only featured products (featured = true) that are not hidden
   const { data: rawProducts, error } = await supabase
     .from('productos')
     .select('*')
@@ -19,7 +22,13 @@ export default async function Home() {
     console.error('Error fetching featured products from Supabase:', error);
   }
 
-  const products = (rawProducts || []).map((p) => ({
+  // Filter out products marked as OCULTO in tags
+  const visibleProducts = (rawProducts || []).filter((p) => {
+    if (Array.isArray(p.tags) && p.tags.includes('OCULTO')) return false;
+    return true;
+  });
+
+  const products = visibleProducts.map((p) => ({
     ...p,
     price: Number(p.price),
     originalPrice: p.originalPrice ? Number(p.originalPrice) : undefined,

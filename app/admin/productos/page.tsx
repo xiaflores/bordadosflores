@@ -22,6 +22,8 @@ interface Product {
   availability: 'En Stock' | 'A Pedido';
   imageUrl: string;
   featured: boolean;
+  tags?: string[] | null;
+  isVisible: boolean;
 }
 
 export default function AdminProductsPage() {
@@ -45,7 +47,7 @@ export default function AdminProductsPage() {
     try {
       const { data, error } = await supabase
         .from('productos')
-        .select('id, name, category, price, availability, imageUrl, featured')
+        .select('id, name, category, price, availability, imageUrl, featured, tags')
         .neq('id', '00000000-0000-0000-0000-000000000000')
         .order('id', { ascending: true });
 
@@ -54,7 +56,8 @@ export default function AdminProductsPage() {
       if (data) {
         setProducts(data.map(p => ({
           ...p,
-          price: Number(p.price)
+          price: Number(p.price),
+          isVisible: !Array.isArray(p.tags) || !p.tags.includes('OCULTO')
         })));
       }
     } catch (err) {
@@ -80,12 +83,41 @@ export default function AdminProductsPage() {
 
       if (error) throw error;
     } catch (err) {
-      console.error('Error updating product visibility:', err);
+      console.error('Error updating product featured status:', err);
       // Revert optimistic update
       setProducts(prev =>
         prev.map(p => (p.id === productId ? { ...p, featured: currentVal } : p))
       );
-      alert('Error al actualizar la visibilidad en Supabase.');
+      alert('Error al actualizar el estado destacado en Supabase.');
+    }
+  };
+
+  const handleToggleVisible = async (productId: string, currentIsVisible: boolean) => {
+    const newIsVisible = !currentIsVisible;
+
+    // Optimistic update
+    setProducts(prev =>
+      prev.map(p => (p.id === productId ? { ...p, isVisible: newIsVisible } : p))
+    );
+
+    try {
+      const product = products.find(p => p.id === productId);
+      const currentTags = (product?.tags || []).filter(t => typeof t === 'string' && t !== 'OCULTO');
+      const updatedTags = newIsVisible ? currentTags : [...currentTags, 'OCULTO'];
+
+      const { error } = await supabase
+        .from('productos')
+        .update({ tags: updatedTags })
+        .eq('id', productId);
+
+      if (error) throw error;
+    } catch (err) {
+      console.error('Error updating product visibility:', err);
+      // Revert optimistic update
+      setProducts(prev =>
+        prev.map(p => (p.id === productId ? { ...p, isVisible: currentIsVisible } : p))
+      );
+      alert('Error al actualizar la visibilidad del producto.');
     }
   };
 
@@ -202,6 +234,7 @@ export default function AdminProductsPage() {
                 <th className="px-6 py-5 text-[11px] font-extrabold uppercase tracking-widest text-on-surface-variant">Categoría</th>
                 <th className="px-6 py-5 text-[11px] font-extrabold uppercase tracking-widest text-on-surface-variant">Precio</th>
                 <th className="px-6 py-5 text-[11px] font-extrabold uppercase tracking-widest text-on-surface-variant">Estado</th>
+                <th className="px-6 py-5 text-[11px] font-extrabold uppercase tracking-widest text-on-surface-variant text-center">Visible</th>
                 <th className="px-6 py-5 text-[11px] font-extrabold uppercase tracking-widest text-on-surface-variant text-center">Destacado</th>
                 <th className="px-6 py-5 text-[11px] font-extrabold uppercase tracking-widest text-on-surface-variant text-right">Acciones</th>
               </tr>
@@ -239,10 +272,30 @@ export default function AdminProductsPage() {
                         <span className="text-sm font-bold text-on-surface">{product.availability}</span>
                       </div>
                     </td>
+                    {/* Visible Toggle */}
+                    <td className="px-6 py-4">
+                      <div className="flex justify-center">
+                        <button
+                          onClick={() => handleToggleVisible(product.id, product.isVisible)}
+                          title={product.isVisible ? 'Producto Visible en Tienda' : 'Producto Oculto en Tienda'}
+                          className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+                            product.isVisible ? 'bg-emerald-600' : 'bg-surface-container-highest'
+                          }`}
+                        >
+                          <span
+                            className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+                              product.isVisible ? 'translate-x-5' : 'translate-x-0'
+                            }`}
+                          />
+                        </button>
+                      </div>
+                    </td>
+                    {/* Destacado Toggle */}
                     <td className="px-6 py-4">
                       <div className="flex justify-center">
                         <button
                           onClick={() => handleToggleFeatured(product.id, product.featured)}
+                          title={product.featured ? 'Destacado en Home' : 'No Destacado'}
                           className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
                             product.featured ? 'bg-primary' : 'bg-surface-container-highest'
                           }`}

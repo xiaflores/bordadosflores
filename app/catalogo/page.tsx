@@ -30,7 +30,8 @@ export default async function CatalogoPage({ searchParams }: CatalogoProps) {
   let dbQuery = supabase
     .from('productos')
     .select('*', { count: 'exact' })
-    .neq('id', '00000000-0000-0000-0000-000000000000');
+    .neq('id', '00000000-0000-0000-0000-000000000000')
+    .not('tags', 'cs', '{"OCULTO"}');
 
   // 1. Filter by chip selection
   if (currentFilter === 'Novedades') {
