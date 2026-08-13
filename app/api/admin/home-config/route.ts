@@ -4,15 +4,28 @@ import { DEFAULT_HERO_SLIDES, DEFAULT_HOME_TEXTS } from '@/lib/homeContent';
 
 const SYS_CONFIG_ID = '00000000-0000-0000-0000-000000000000';
 
+let cachedConfigPayload: { slides: any[]; texts: any } | null = null;
+let lastCacheTimestamp = 0;
+const CACHE_TTL_MS = 60 * 1000; // 60s cache in server memory
+
 export async function GET() {
+  const now = Date.now();
+  if (cachedConfigPayload && now - lastCacheTimestamp < CACHE_TTL_MS) {
+    return NextResponse.json(cachedConfigPayload, {
+      headers: {
+        'Cache-Control': 'public, max-age=15, stale-while-revalidate=60'
+      }
+    });
+  }
+
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
   if (!supabaseUrl || !anonKey) {
-    return NextResponse.json({
-      slides: DEFAULT_HERO_SLIDES,
-      texts: DEFAULT_HOME_TEXTS
-    });
+    const fallback = { slides: DEFAULT_HERO_SLIDES, texts: DEFAULT_HOME_TEXTS };
+    cachedConfigPayload = fallback;
+    lastCacheTimestamp = now;
+    return NextResponse.json(fallback);
   }
 
   try {
@@ -24,17 +37,25 @@ export async function GET() {
       .maybeSingle();
 
     if (error || !data || !data.description) {
-      return NextResponse.json({
-        slides: DEFAULT_HERO_SLIDES,
-        texts: DEFAULT_HOME_TEXTS
-      });
+      const fallback = { slides: DEFAULT_HERO_SLIDES, texts: DEFAULT_HOME_TEXTS };
+      cachedConfigPayload = fallback;
+      lastCacheTimestamp = now;
+      return NextResponse.json(fallback);
     }
 
     const parsed = JSON.parse(data.description);
-
-    return NextResponse.json({
+    const result = {
       slides: parsed.slides && Array.isArray(parsed.slides) && parsed.slides.length > 0 ? parsed.slides : DEFAULT_HERO_SLIDES,
       texts: parsed.texts ? { ...DEFAULT_HOME_TEXTS, ...parsed.texts } : DEFAULT_HOME_TEXTS
+    };
+
+    cachedConfigPayload = result;
+    lastCacheTimestamp = now;
+
+    return NextResponse.json(result, {
+      headers: {
+        'Cache-Control': 'public, max-age=15, stale-while-revalidate=60'
+      }
     });
   } catch (err) {
     console.error('Error fetching home config from productos table:', err);
@@ -121,6 +142,9 @@ export async function POST(request: NextRequest) {
         { status: 500 }
       );
     }
+
+    cachedConfigPayload = null;
+    lastCacheTimestamp = 0;
 
     return NextResponse.json({
       success: true,

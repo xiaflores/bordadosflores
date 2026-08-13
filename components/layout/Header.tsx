@@ -96,8 +96,8 @@ export default function Header() {
             <Link href="/" className="flex items-center">
               <img
                 alt="Bordados Flores Logo"
-                className="h-10 w-10 object-contain"
-                src="https://lh3.googleusercontent.com/aida-public/AB6AXuA3ok8RTRW6cxAwh3XQHvYm7TksIbjQh3YubTN36ArE6tF08MCC8HlXkIUW0_YTMInNFCFsbepuAqKZSAX2wZuKDek8FNUAwZ12jfnexWvaopWv-8w5bvzb3qxHfbhOH_22TF5yUOEn1r2JlAB7zdFmLw378ufoL6e4xPoOnwdHeO7TMX8ae2o6JziZz5YSiirkKu_3X93IWYW3yY1MSKgpiwXaS4gUe7oxaQ49AlE9bouNy1346D4EgxeSbQzw1cB2-Pg2F0P_kA"
+                className="h-10 w-10 object-contain rounded-full"
+                src="/images/logo.webp"
               />
             </Link>
           </div>

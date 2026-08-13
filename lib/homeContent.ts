@@ -92,8 +92,12 @@ export function getStoredHeroSlides(): HeroSlide[] {
 export function saveStoredHeroSlides(slides: HeroSlide[]): void {
   if (typeof window === 'undefined') return;
   try {
-    localStorage.setItem(SLIDES_STORAGE_KEY, JSON.stringify(slides));
-    window.dispatchEvent(new Event('bordados_flores_slides_updated'));
+    const newJson = JSON.stringify(slides);
+    const oldJson = localStorage.getItem(SLIDES_STORAGE_KEY);
+    if (newJson !== oldJson) {
+      localStorage.setItem(SLIDES_STORAGE_KEY, newJson);
+      window.dispatchEvent(new Event('bordados_flores_slides_updated'));
+    }
   } catch (e) {
     console.error('Error saving hero slides to localStorage:', e);
   }
@@ -116,8 +120,12 @@ export function getStoredHomeTexts(): HomeTexts {
 export function saveStoredHomeTexts(texts: HomeTexts): void {
   if (typeof window === 'undefined') return;
   try {
-    localStorage.setItem(TEXTS_STORAGE_KEY, JSON.stringify(texts));
-    window.dispatchEvent(new Event('bordados_flores_texts_updated'));
+    const newJson = JSON.stringify(texts);
+    const oldJson = localStorage.getItem(TEXTS_STORAGE_KEY);
+    if (newJson !== oldJson) {
+      localStorage.setItem(TEXTS_STORAGE_KEY, newJson);
+      window.dispatchEvent(new Event('bordados_flores_texts_updated'));
+    }
   } catch (e) {
     console.error('Error saving home texts to localStorage:', e);
   }
