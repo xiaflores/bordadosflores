@@ -5,13 +5,15 @@ import Link from 'next/link';
 import { Product } from '@/types/product';
 import { Heart } from 'lucide-react';
 import { formatCurrency } from '@/lib/utils';
+import { useFavorites } from '@/context/FavoritesContext';
 
 interface ProductCardProps {
   product: Product;
 }
 
 export default function ProductCard({ product }: ProductCardProps) {
-  const [isFavorite, setIsFavorite] = useState(false);
+  const { isFavorite, toggleFavorite } = useFavorites();
+  const activeFavorite = isFavorite(product.id);
 
   return (
     <article className="bg-surface-container-lowest rounded-xl overflow-hidden shadow-[0px_4px_20px_rgba(0,0,0,0.04)] hover:shadow-lg transition-all duration-300 group relative flex flex-col justify-between">
@@ -30,14 +32,14 @@ export default function ProductCard({ product }: ProductCardProps) {
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                setIsFavorite(!isFavorite);
+                toggleFavorite(product.id);
               }}
-              className={`absolute top-2 left-2 w-10 h-10 bg-white/80 backdrop-blur-xs rounded-full flex items-center justify-center transition-all active:scale-90 shadow-sm z-10 ${
-                isFavorite ? 'text-primary' : 'text-secondary'
+              className={`absolute top-2 left-2 w-10 h-10 bg-white/90 backdrop-blur-xs rounded-full flex items-center justify-center transition-all active:scale-90 shadow-sm z-10 ${
+                activeFavorite ? 'text-primary' : 'text-slate-500 hover:text-primary'
               }`}
-              aria-label="Agregar a favoritos"
+              aria-label={activeFavorite ? 'Quitar de favoritos' : 'Agregar a favoritos'}
             >
-              <Heart className="w-5 h-5" fill={isFavorite ? 'currentColor' : 'none'} />
+              <Heart className="w-5 h-5" fill={activeFavorite ? 'currentColor' : 'none'} />
             </button>
 
             {/* Availability Badge (Top-Right) */}

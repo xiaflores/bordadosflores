@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { CartProvider } from "@/context/CartContext";
+import { FavoritesProvider } from "@/context/FavoritesContext";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://bordadosflores.com';
 
@@ -63,9 +64,11 @@ export default function RootLayout({
         <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet' />
       </head>
       <body className="min-h-full bg-surface font-body-md text-on-surface selection:bg-primary-fixed selection:text-on-primary-fixed">
-        <CartProvider>
-          {children}
-        </CartProvider>
+        <FavoritesProvider>
+          <CartProvider>
+            {children}
+          </CartProvider>
+        </FavoritesProvider>
       </body>
     </html>
   );

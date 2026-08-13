@@ -6,13 +6,15 @@ import { usePathname } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { User } from '@supabase/supabase-js';
 import { useCart } from '@/context/CartContext';
-import { Search, ShoppingBag } from 'lucide-react';
+import { useFavorites } from '@/context/FavoritesContext';
+import { Search, ShoppingBag, Heart } from 'lucide-react';
 
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const pathname = usePathname();
   const [user, setUser] = useState<User | null>(null);
   const { cartCount, isLoaded } = useCart();
+  const { favoritesCount } = useFavorites();
   const [profile, setProfile] = useState<{ full_name: string; avatar_url: string } | null>(null);
 
   useEffect(() => {
@@ -105,6 +107,7 @@ export default function Header() {
         </div>
 
         <div className="flex items-center gap-2 md:gap-6">
+          {/* Desktop Navigation */}
           <nav className="hidden lg:flex items-center gap-6">
             <Link
               className={`font-bold text-label-md uppercase tracking-wider transition-colors ${
@@ -122,22 +125,53 @@ export default function Header() {
             >
               Catálogo
             </Link>
-          </nav>
-
-          <div className="flex items-center gap-1 md:gap-2">
             <Link
-              href="/cesta"
-              className="p-2 rounded-full relative active:scale-95 text-primary hover:bg-surface-container transition-all flex items-center justify-center"
+              className={`font-bold text-label-md uppercase tracking-wider transition-colors flex items-center gap-1.5 relative ${
+                pathname === '/favoritos' ? 'text-primary' : 'text-on-surface hover:text-primary'
+              }`}
+              href="/favoritos"
             >
-              <ShoppingBag className="w-5 h-5" />
+              <span>Favoritos</span>
+              {favoritesCount > 0 && (
+                <span className="bg-primary text-white text-[10px] px-1.5 py-0.2 rounded-full font-extrabold ml-0.5">
+                  {favoritesCount}
+                </span>
+              )}
+            </Link>
+            <Link
+              className={`font-bold text-label-md uppercase tracking-wider transition-colors flex items-center gap-1.5 relative ${
+                pathname === '/cesta' ? 'text-primary' : 'text-on-surface hover:text-primary'
+              }`}
+              href="/cesta"
+            >
+              <ShoppingBag className="w-4 h-4 text-primary" />
+              <span>Cesta</span>
               {isLoaded && cartCount > 0 && (
-                <span className="absolute top-1 right-1 text-white text-[10px] w-4 h-4 flex items-center justify-center rounded-full border border-white bg-primary font-bold">
+                <span className="bg-primary text-white text-[10px] px-1.5 py-0.2 rounded-full font-extrabold ml-0.5">
                   {cartCount}
                 </span>
               )}
             </Link>
+          </nav>
 
-            {/* Profile Link (desktop only, placed after the cart icon) */}
+          {/* Mobile Right Controls: Favorites icon ONLY (No Cart icon in Mobile Header) */}
+          <div className="flex lg:hidden items-center gap-2">
+            <Link
+              href="/favoritos"
+              className="p-2 rounded-full relative active:scale-95 text-primary hover:bg-surface-container transition-all flex items-center justify-center"
+              aria-label="Mis Favoritos"
+            >
+              <Heart className="w-5 h-5 fill-primary text-primary" />
+              {favoritesCount > 0 && (
+                <span className="absolute top-1 right-1 text-white text-[10px] w-4 h-4 flex items-center justify-center rounded-full border border-white bg-primary font-bold">
+                  {favoritesCount}
+                </span>
+              )}
+            </Link>
+          </div>
+
+          <div className="flex items-center gap-1 md:gap-2">
+            {/* Profile Link (desktop only) */}
             {user ? (
               <Link
                 href="/login"

@@ -35,6 +35,8 @@ export default function ProductForm({ productId }: ProductFormProps) {
   const [name, setName] = useState('');
   const [category, setCategory] = useState('Chaquetas');
   const [price, setPrice] = useState(0);
+  const [originalPrice, setOriginalPrice] = useState<number | ''>('');
+  const [discount, setDiscount] = useState<number | ''>('');
   const [availability, setAvailability] = useState<'En Stock' | 'A Pedido'>('En Stock');
   const [description, setDescription] = useState('');
   const [imageUrl, setImageUrl] = useState('');
@@ -43,6 +45,22 @@ export default function ProductForm({ productId }: ProductFormProps) {
   const [newImageUrl, setNewImageUrl] = useState('');
   const [uploadingMain, setUploadingMain] = useState(false);
   const [uploadingGallery, setUploadingGallery] = useState(false);
+
+  const handleOriginalPriceChange = (val: number | '') => {
+    setOriginalPrice(val);
+    if (val && price && Number(val) > Number(price)) {
+      const calcDiscount = Math.round(((Number(val) - Number(price)) / Number(val)) * 100);
+      setDiscount(calcDiscount);
+    }
+  };
+
+  const handlePriceChange = (val: number) => {
+    setPrice(val);
+    if (originalPrice && val && Number(originalPrice) > Number(val)) {
+      const calcDiscount = Math.round(((Number(originalPrice) - Number(val)) / Number(originalPrice)) * 100);
+      setDiscount(calcDiscount);
+    }
+  };
 
   // Dynamic spec attributes
   const [colorName, setColorName] = useState('');
@@ -112,6 +130,8 @@ export default function ProductForm({ productId }: ProductFormProps) {
           setName(data.name || '');
           setCategory(data.category || 'Chaquetas');
           setPrice(Number(data.price) || 0);
+          setOriginalPrice(data.originalPrice || data.original_price || '');
+          setDiscount(data.discount || '');
           setAvailability(data.availability || 'En Stock');
           setDescription(data.description || '');
           const mainImg = data.imageUrl || '';
@@ -206,6 +226,8 @@ export default function ProductForm({ productId }: ProductFormProps) {
       name,
       category,
       price,
+      originalPrice: originalPrice ? Number(originalPrice) : null,
+      discount: discount ? Number(discount) : null,
       availability,
       imageUrl,
       description,
@@ -337,21 +359,55 @@ export default function ProductForm({ productId }: ProductFormProps) {
               <h3 className="font-bold text-sm uppercase tracking-widest text-on-surface-variant">Precio y Disponibilidad</h3>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Price */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+              {/* Precio Oferta / Venta */}
               <div className="flex flex-col gap-2">
-                <label className="text-sm font-semibold text-on-surface">Precio (Bs.) <span className="text-primary">*</span></label>
+                <label className="text-sm font-semibold text-on-surface">Precio Venta (Bs.) <span className="text-primary">*</span></label>
                 <div className="relative">
                   <span className="absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant font-medium text-sm">Bs.</span>
                   <input
-                    className="w-full h-11 pl-12 pr-4 rounded-xl bg-surface-container-lowest border border-outline-variant/50 focus:border-primary focus:ring-4 focus:ring-primary/5 transition-all text-sm"
+                    className="w-full h-11 pl-12 pr-4 rounded-xl bg-surface-container-lowest border border-outline-variant/50 focus:border-primary focus:ring-4 focus:ring-primary/5 transition-all text-sm font-bold text-primary"
                     placeholder="850.00"
                     type="number"
                     min="0"
                     step="0.01"
                     value={price || ''}
-                    onChange={(e) => setPrice(Number(e.target.value))}
+                    onChange={(e) => handlePriceChange(Number(e.target.value))}
                     required
+                  />
+                </div>
+              </div>
+
+              {/* Precio Original / Antes */}
+              <div className="flex flex-col gap-2">
+                <label className="text-sm font-semibold text-on-surface">Precio Original (Bs.) <span className="text-[10px] text-on-surface-variant font-normal">(Tachado)</span></label>
+                <div className="relative">
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant font-medium text-sm">Bs.</span>
+                  <input
+                    className="w-full h-11 pl-12 pr-4 rounded-xl bg-surface-container-lowest border border-outline-variant/50 focus:border-primary focus:ring-4 focus:ring-primary/5 transition-all text-sm font-semibold text-on-surface-variant"
+                    placeholder="1000.00"
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    value={originalPrice}
+                    onChange={(e) => handleOriginalPriceChange(e.target.value ? Number(e.target.value) : '')}
+                  />
+                </div>
+              </div>
+
+              {/* Descuento (%) */}
+              <div className="flex flex-col gap-2">
+                <label className="text-sm font-semibold text-on-surface">Descuento (%)</label>
+                <div className="relative">
+                  <span className="absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant font-bold text-sm">%</span>
+                  <input
+                    className="w-full h-11 px-4 pr-10 rounded-xl bg-surface-container-lowest border border-outline-variant/50 focus:border-primary focus:ring-4 focus:ring-primary/5 transition-all text-sm font-bold text-emerald-600"
+                    placeholder="15"
+                    type="number"
+                    min="0"
+                    max="100"
+                    value={discount}
+                    onChange={(e) => setDiscount(e.target.value ? Number(e.target.value) : '')}
                   />
                 </div>
               </div>

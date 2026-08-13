@@ -5,6 +5,7 @@ import Header from '@/components/layout/Header';
 import BottomNav from '@/components/layout/BottomNav';
 import { Product } from '@/types/product';
 import { useCart } from '@/context/CartContext';
+import { useFavorites } from '@/context/FavoritesContext';
 import { DEPARTAMENTOS, DESTINATION_LABELS, getDepartamentosWithCosts } from '@/lib/constants';
 import { formatCurrency } from '@/lib/utils';
 import { 
@@ -33,11 +34,12 @@ interface ProductDetailClientProps {
 
 export default function ProductDetailClient({ product }: ProductDetailClientProps) {
   const { addToCart } = useCart();
+  const { isFavorite, toggleFavorite } = useFavorites();
+  const isProductFav = isFavorite(product.id);
   const images = Array.from(
     new Set([product.imageUrl, ...(product.images || [])])
   ).filter((img): img is string => Boolean(img && img.trim()));
   const [activeImageIndex, setActiveImageIndex] = useState(0);
-  const [isFavorite, setIsFavorite] = useState(false);
   const [shippingDestination, setShippingDestination] = useState('or');
   const [customShippingLocation, setCustomShippingLocation] = useState('');
   const [cartState, setCartState] = useState<'idle' | 'processing' | 'added'>('idle');
@@ -346,13 +348,13 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
 
             {/* Favorite button */}
             <button
-              onClick={() => setIsFavorite(!isFavorite)}
+              onClick={() => toggleFavorite(product.id)}
               className={`absolute top-4 left-4 w-11 h-11 bg-white/90 backdrop-blur-md rounded-full flex items-center justify-center shadow-lg hover:bg-white active:scale-90 transition-all z-10 ${
-                isFavorite ? 'text-primary' : 'text-on-surface-variant'
+                isProductFav ? 'text-primary' : 'text-slate-500 hover:text-primary'
               }`}
-              aria-label="Agregar a favoritos"
+              aria-label={isProductFav ? 'Quitar de favoritos' : 'Agregar a favoritos'}
             >
-              <Heart className="w-6 h-6" fill={isFavorite ? 'currentColor' : 'none'} />
+              <Heart className="w-6 h-6" fill={isProductFav ? 'currentColor' : 'none'} />
             </button>
 
             {/* Carousel navigation buttons (Desktop/Tablet overlay) */}

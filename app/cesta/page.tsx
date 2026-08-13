@@ -198,10 +198,6 @@ export default function CestaPage() {
       <Header />
       <div className="artisanal-bg min-h-screen pt-24 pb-28 px-margin-mobile md:px-margin-tablet lg:px-margin-desktop">
         <main className="max-w-container-max mx-auto w-full">
-          <h1 className="font-headline-lg text-headline-lg font-bold text-on-surface mb-8 text-center lg:text-left flex items-center justify-center lg:justify-start gap-3">
-            <ShoppingBasket className="w-10 h-10 text-primary" />
-            Mi Cesta de Compras
-          </h1>
 
           {cartItems.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-20 bg-white/70 backdrop-blur-md rounded-2xl border border-primary/10 max-w-2xl mx-auto shadow-sm p-8 text-center">
