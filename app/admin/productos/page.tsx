@@ -379,25 +379,47 @@ export default function AdminProductsPage() {
                     <p className="text-base font-extrabold text-primary mt-1">{product.price} Bs.</p>
                   </div>
                 </div>
-                <div className="flex items-center justify-between pt-2 border-t border-outline-variant/10">
+                <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-outline-variant/10">
                   <div className="flex items-center gap-2">
                     <span className={`w-2 h-2 rounded-full ${product.availability === 'En Stock' ? 'bg-green-500' : 'bg-amber-500'}`}></span>
                     <span className="text-xs font-bold text-on-surface">{product.availability}</span>
                   </div>
-                  <div className="flex items-center gap-3">
-                    <span className="text-[10px] font-extrabold uppercase tracking-widest text-on-surface-variant">Destacado</span>
-                    <button
-                      onClick={() => handleToggleFeatured(product.id, product.featured)}
-                      className={`relative inline-flex h-5 w-10 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
-                        product.featured ? 'bg-primary' : 'bg-surface-container-highest'
-                      }`}
-                    >
-                      <span
-                        className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
-                          product.featured ? 'translate-x-5' : 'translate-x-0'
+                  <div className="flex items-center gap-4">
+                    {/* Visible Toggle (Mobile) */}
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-[10px] font-extrabold uppercase tracking-wider text-on-surface-variant">Visible</span>
+                      <button
+                        onClick={() => handleToggleVisible(product.id, product.isVisible)}
+                        title={product.isVisible ? 'Visible en Tienda' : 'Oculto en Tienda'}
+                        className={`relative inline-flex h-5 w-10 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+                          product.isVisible ? 'bg-emerald-600' : 'bg-surface-container-highest'
                         }`}
-                      />
-                    </button>
+                      >
+                        <span
+                          className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+                            product.isVisible ? 'translate-x-5' : 'translate-x-0'
+                          }`}
+                        />
+                      </button>
+                    </div>
+
+                    {/* Destacado Toggle (Mobile) */}
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-[10px] font-extrabold uppercase tracking-wider text-on-surface-variant">Destacado</span>
+                      <button
+                        onClick={() => handleToggleFeatured(product.id, product.featured)}
+                        title={product.featured ? 'Destacado en Home' : 'No Destacado'}
+                        className={`relative inline-flex h-5 w-10 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+                          product.featured ? 'bg-primary' : 'bg-surface-container-highest'
+                        }`}
+                      >
+                        <span
+                          className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+                            product.featured ? 'translate-x-5' : 'translate-x-0'
+                          }`}
+                        />
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>

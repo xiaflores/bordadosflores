@@ -441,9 +441,6 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                   {formatCurrency(product.originalPrice)}
                 </span>
               )}
-              <span className="px-2 py-0.5 rounded bg-secondary/10 text-secondary font-label-md text-[10px] tracking-wide uppercase font-semibold">
-                Alta Costura
-              </span>
             </div>
           </div>
 
