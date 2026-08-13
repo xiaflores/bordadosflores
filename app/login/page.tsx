@@ -96,11 +96,13 @@ export default function LoginPage() {
     }
   };
 
+  const [userRole, setUserRole] = useState<string>('user');
+
   const fetchProfile = async (userId: string) => {
     try {
       const { data, error } = await supabase
         .from('profiles')
-        .select('full_name, avatar_url')
+        .select('full_name, avatar_url, role')
         .eq('id', userId)
         .maybeSingle();
       if (error) throw error;
@@ -109,6 +111,9 @@ export default function LoginPage() {
           full_name: data.full_name || '',
           avatar_url: data.avatar_url || ''
         });
+        if (data.role) {
+          setUserRole(data.role);
+        }
       }
     } catch (err) {
       console.error('Error fetching database profile:', err);
@@ -257,7 +262,23 @@ export default function LoginPage() {
       } else {
         setSuccessMsg('Sesión iniciada correctamente.');
         setUser(data.user);
-        router.push('/');
+
+        // Fetch user profile role to determine redirection
+        try {
+          const { data: prof } = await supabase
+            .from('profiles')
+            .select('role')
+            .eq('id', data.user.id)
+            .maybeSingle();
+
+          if (prof?.role === 'admin') {
+            router.push('/admin');
+          } else {
+            router.push('/');
+          }
+        } catch {
+          router.push('/');
+        }
       }
     }
     setLoading(false);
@@ -533,6 +554,28 @@ export default function LoginPage() {
             
             {/* Header title */}
             <h1 className="font-headline-lg text-headline-lg text-primary mb-5">Mi Perfil</h1>
+
+            {/* Admin Panel Access Banner (rendered for admin users) */}
+            {userRole === 'admin' && (
+              <div className="mb-6 p-4 bg-amber-50 border border-amber-300 rounded-2xl text-left flex flex-col sm:flex-row items-center justify-between gap-3 shadow-xs">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-amber-500 text-white flex items-center justify-center font-bold flex-shrink-0 shadow-sm">
+                    <Sparkles className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-xs text-on-surface uppercase tracking-wider">Modo Administrador</h3>
+                    <p className="text-[11px] text-on-surface-variant">Acceso total a gestión de productos y pedidos.</p>
+                  </div>
+                </div>
+                <Link
+                  href="/admin"
+                  className="w-full sm:w-auto px-4 py-2.5 bg-primary text-on-primary font-bold text-xs uppercase tracking-wider rounded-xl hover:bg-primary-hover transition-all flex items-center justify-center gap-1.5 shadow-md shrink-0 active:scale-95 cursor-pointer"
+                >
+                  <span>Panel Admin</span>
+                  <ArrowRight className="w-4 h-4" />
+                </Link>
+              </div>
+            )}
 
             {/* Persistent Tab Navigation Header */}
             <div className="flex border-b border-outline-variant/20 mb-6">

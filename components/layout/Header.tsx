@@ -7,7 +7,7 @@ import { supabase } from '@/lib/supabase';
 import { User } from '@supabase/supabase-js';
 import { useCart } from '@/context/CartContext';
 import { useFavorites } from '@/context/FavoritesContext';
-import { Search, ShoppingBag, Heart } from 'lucide-react';
+import { Search, ShoppingBag, Heart, ShieldCheck } from 'lucide-react';
 
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -15,7 +15,7 @@ export default function Header() {
   const [user, setUser] = useState<User | null>(null);
   const { cartCount, isLoaded } = useCart();
   const { favoritesCount } = useFavorites();
-  const [profile, setProfile] = useState<{ full_name: string; avatar_url: string } | null>(null);
+  const [profile, setProfile] = useState<{ full_name: string; avatar_url: string; role: string } | null>(null);
 
   useEffect(() => {
     if (user) {
@@ -23,13 +23,14 @@ export default function Header() {
         try {
           const { data } = await supabase
             .from('profiles')
-            .select('full_name, avatar_url')
+            .select('full_name, avatar_url, role')
             .eq('id', user.id)
             .maybeSingle();
           if (data) {
             setProfile({
               full_name: data.full_name || '',
-              avatar_url: data.avatar_url || ''
+              avatar_url: data.avatar_url || '',
+              role: data.role || 'user'
             });
           }
         } catch (err) {
@@ -152,6 +153,17 @@ export default function Header() {
                 </span>
               )}
             </Link>
+            {profile?.role === 'admin' && (
+              <Link
+                className={`font-bold text-label-md uppercase tracking-wider transition-colors flex items-center gap-1 px-2.5 py-1 rounded-full bg-amber-50 text-amber-700 border border-amber-300 hover:bg-amber-100 shadow-2xs ${
+                  pathname.startsWith('/admin') ? 'ring-2 ring-amber-500' : ''
+                }`}
+                href="/admin"
+              >
+                <ShieldCheck className="w-4 h-4 text-amber-600" />
+                <span>Panel Admin</span>
+              </Link>
+            )}
           </nav>
 
           {/* Mobile Right Controls: Favorites icon ONLY (No Cart icon in Mobile Header) */}
